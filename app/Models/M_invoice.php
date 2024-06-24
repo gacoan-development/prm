@@ -142,20 +142,14 @@ class M_invoice extends Model
             'a.inv_status' => 0 // nyari yang inv_status nya 0 artinya masih outstanding
         ];
         $result = $this->db->table('tinvoice a')
+                            ->select('a.inv_id, a.inv_date, a.inv_code, a.branch_id, a.billed_nominal, a.pay_off_nominal, a.inv_status, b.latest_order, c.installment_order, c.installment_paid_amount, c.amount_outstanding, c.ref_inv_id')
                             ->join('(SELECT
-                                        *
-                                        FROM 
-                                            (SELECT
-                                            a.*
-                                            FROM tinstallment_payment a
-                                            JOIN tinvoice b ON b.inv_id = a.inv_id
-                                            WHERE b.branch_id = "'.$branch_id.'"
-                                            AND b.inv_date = "'.$inv_date.'"
-                                            ORDER BY a.installment_order DESC
-                                            LIMIT 1) a
+                                        a.inv_id, MAX(a.installment_order) AS latest_order
+                                        FROM tinstallment_payment a
                                         GROUP BY a.inv_id) b', 'b.inv_id = a.inv_id', 'left')
+                            ->join('tinstallment_payment c', 'c.inv_id = a.inv_id AND c.installment_order = b.latest_order', 'left')
                             ->where($where_params)
-                            ->orderBy('b.installment_order', 'desc')
+                            ->orderBy('a.inv_date', 'asc')
                             ->get()->getResult();
         foreach($result AS $value){
             $value->inv_date = date('d/m/Y', strtotime($value->inv_date));
@@ -189,6 +183,7 @@ class M_invoice extends Model
                             ->join('tbranch c', 'c.branch_id = a.branch_id', 'left')
                             ->join('tparkmanagement d', 'd.parkmanagement_id = c.parkmanagement_id', 'left')
                             ->whereIn('a.inv_id', $checkedId)
+                            ->orderBy('a.inv_date', 'ASC')
                             ->get()->getResult();
         foreach($result AS $value){
             $value->inv_date = date('d/m/Y', strtotime($value->inv_date));
@@ -215,6 +210,9 @@ class M_invoice extends Model
             $update_data = [
                 'a.pay_off_nominal' => $updated_pay_off
             ];
+            if($selisih_invoice == 0){
+                $update_data['a.inv_status'] = 1;
+            }
             $this->db->table('tinvoice a')
                         ->where('a.inv_id', $inv_id_upload)
                         ->update($update_data);
@@ -238,6 +236,48 @@ class M_invoice extends Model
             $affected_installment_payment = $this->db->affectedRows();
             return $affected_installment_payment;
         }
+    }
+
+    public function update_selected_outstanding_invoice($outstanding_comp, $inv_id_upload){
+        foreach($outstanding_comp AS $key => $outstanding_row){
+            $outstanding_id = $outstanding_row['id'];
+            $outstanding_deposit = $outstanding_row['outstanding_deposit'];
+            $outstanding_nominal = $outstanding_row['outstanding_nominal'];
+            $result_current_pay_off = $this->db->table('tinvoice a')
+                                                        ->select('a.pay_off_nominal')
+                                                        ->where('a.inv_id', $outstanding_id)
+                                                        ->get()->getResult();
+            $current_pay_off = $result_current_pay_off[0]->pay_off_nominal;
+            $updated_pay_off = $current_pay_off + $outstanding_deposit;
+            $update_data = [
+                'a.pay_off_nominal' => $updated_pay_off
+            ];
+            if($outstanding_nominal == 0){
+                $update_data['a.inv_status'] = 1;
+            }
+            $this->db->table('tinvoice a')
+                        ->where('a.inv_id', $outstanding_id)
+                        ->update($update_data);
+            // inserting rows to installment payment
+            $result_last_installment_order = $this->db->table('tinstallment_payment a')
+                                                        ->select('IF(MAX(a.installment_order) IS NULL, 0, MAX(a.installment_order)) AS last_installment_order')
+                                                        ->where('a.inv_id', $outstanding_id)
+                                                        ->get()->getResult();
+            $last_installment_order = $result_last_installment_order[0]->last_installment_order;
+
+            $insert_data = [
+                'inv_id' => $outstanding_id,
+                'installment_order' => intval($last_installment_order)+1,
+                'installment_paid_amount' => $outstanding_deposit,
+                'amount_outstanding' => $outstanding_nominal,
+                'ref_inv_id' => $inv_id_upload,
+                'date_pay_off' => date('Y-m-d H:i:s')
+            ];
+            $this->db->table('tinstallment_payment')
+                        ->insert($insert_data);
+            $affected_installment_payment = $this->db->affectedRows();
+        }
+        return $affected_installment_payment;
     }
 }
 

@@ -148,7 +148,15 @@ class Invoice extends BaseController
         $selisih_invoice = $this->request->getPost('selisih_invoice');
         $minvoice = new M_invoice();
         $result = $minvoice->update_uploaded_invoice($inv_id_upload, $filename, $setoran_invoice, $selisih_invoice);
-        return $result;
+        return json_encode($result);
+    }
+
+    public function update_selected_outstanding_invoice(){
+        $outstanding_compilation = $this->request->getPost('outstanding_comp');
+        $inv_id_upload = $this->request->getPost('inv_id_upload');
+        $minvoice = new M_invoice();
+        $result = $minvoice->update_selected_outstanding_invoice($outstanding_compilation, $inv_id_upload);
+        return json_encode($result);
     }
 }
 

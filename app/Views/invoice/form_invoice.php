@@ -979,6 +979,8 @@ $(document).off('click', '#upload_invoice_action').on('click', '#upload_invoice_
     var uploadStatus = false;
     var uploaded_filename = '';
 
+    // console.log($(document).find('.outstanding_invoice:checked').length);
+
     $.ajax({
         async: false,
         type: "POST",
@@ -1001,16 +1003,8 @@ $(document).off('click', '#upload_invoice_action').on('click', '#upload_invoice_
             }
         }
     });
-
-    // console.log(uploaded_filename);
     var setoran_invoice = $(document).find('[name="setor_invoice"]').val();
     var selisih_invoice = parseRupiah($(document).find('#terutang_invoice').html());
-    // selectedOutstandingComp = [];
-    // $(document).find('.outstanding_invoice:checked').each(function(index, element){
-    //     var id_outstanding_invoice = this.value;
-    //     selectedOutstandingComp.push(id_outstanding_invoice);
-    // })
-    // console.log(selectedOutstandingComp);
     if(uploaded_filename != ''){
         $.ajax({
             async: false,
@@ -1026,18 +1020,72 @@ $(document).off('click', '#upload_invoice_action').on('click', '#upload_invoice_
             success: function (response) {
                 // console.log(response);
                 if(response == '1'){
-                    Swal.fire({
-                        icon: "success",
-                        title: "Berhasil!",
-                        text: "Berhasil mengunggah file!",
-                        allowOutsideClick: false,
-                        showConfirmButton: true
-                    })
-                    .then((feedback)=>{
-                        if(feedback.isConfirmed){
-                            window.location = "<?= base_url('invoice/form_invoice') ?>";
-                        }
-                    })
+                    if($(document).find('.outstanding_invoice:checked').length > 0){
+                        var compSelectedOutstanding = [];
+                        $(document).find('.outstanding_invoice:checked').each(function(index, element){
+                            var id_outstanding_invoice = this.value;
+                            var outstanding_nominal = parseRupiah($(this).closest('tr').find('.outstanding_remainder').html());
+                            var outstanding_deposit = parseInt($(this).closest('tr').find('.outstanding_invoice_deposit').val());
+
+                            compSelectedOutstanding.push({
+                                id: id_outstanding_invoice,
+                                outstanding_nominal: outstanding_nominal,
+                                outstanding_deposit: outstanding_deposit
+                            })
+                        })
+                        // console.log(compSelectedOutstanding);
+                        $.ajax({
+                            async: false,
+                            type: "POST",
+                            url: "<?= base_url('invoice/update_selected_outstanding_invoice'); ?>",
+                            data: {
+                                outstanding_comp: compSelectedOutstanding,
+                                inv_id_upload: inv_id_upload
+                            },
+                            dataType: "JSON",
+                            success: function (response) {
+                                // console.log(response);
+                                if(response == '1'){
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Berhasil!",
+                                        text: "Berhasil mengunggah file!",
+                                        allowOutsideClick: false,
+                                        showConfirmButton: true
+                                    })
+                                    .then((feedback)=>{
+                                        if(feedback.isConfirmed){
+                                            window.location = "<?= base_url('invoice/form_invoice') ?>";
+                                        }
+                                    })
+                                }else{
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Gagal!",
+                                        text: "Gagal mengunggah file!",
+                                        allowOutsideClick: false,
+                                        showConfirmButton: true
+                                    })
+                                    .then((feedback)=>{
+                                        
+                                    })
+                                }
+                            }
+                        });
+                    }else{
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil!",
+                            text: "Berhasil mengunggah file!",
+                            allowOutsideClick: false,
+                            showConfirmButton: true
+                        })
+                        .then((feedback)=>{
+                            if(feedback.isConfirmed){
+                                window.location = "<?= base_url('invoice/form_invoice') ?>";
+                            }
+                        })
+                    }
                 }else{
                     Swal.fire({
                         icon: "error",
@@ -1076,16 +1124,19 @@ $(document).off('keyup', '.outstanding_invoice_deposit').on('keyup', '.outstandi
     var terbayar = (parseInt(deposit_value) + parseInt(outstanding_invoice_array[index].pay_off_nominal));
     $(this).closest('tr').find('.outstanding_paid_off').html(rupiah(terbayar));
 
-    var terutang = (parseInt(outstanding_invoice_array[index].amount_outstanding) - parseInt(deposit_value));
-    console.log(outstanding_invoice_array)
+    if(outstanding_invoice_array[index].amount_outstanding != null){
+        var terutang = (parseInt(outstanding_invoice_array[index].amount_outstanding) - parseInt(deposit_value));
+    }else{
+        var terutang = (parseInt(outstanding_invoice_array[index].billed_nominal) - parseInt(deposit_value));
+    }
+    
+    // console.log(outstanding_invoice_array)
     // console.log(parseInt(outstanding_invoice_array[index].amount_outstanding));
     $(this).closest('tr').find('.outstanding_remainder').html(rupiah(terutang))
     // console.log(parseRupiah($(this).closest('tr').find('.outstanding_paid_off').html()));
     // console.log(parseInt(deposit_value));
     // var terbayar = (parseInt(deposit_value) + parseRupiah($(this).closest('tr').find('.outstanding_paid_off').html()));
     // $(this).closest('tr').find('.outstanding_paid_off').html(rupiah(terbayar));
-
-
 });
 
 function date_convert(date){

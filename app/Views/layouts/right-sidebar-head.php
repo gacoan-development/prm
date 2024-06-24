@@ -21,6 +21,7 @@
                         <li class="sidebar-list"> <a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="database"></i><span>Master </span></a>
                             <ul class="sidebar-submenu">
                                 <li><a href="<?= base_url('resto'); ?>">Data Resto</a></li>
+                                <li><a href="<?= base_url('group_resto'); ?>">Group Resto</a></li>
                                 <li><a href="<?= base_url('tarif_parkir'); ?>">Tarif Parkir</a></li>
                                 <li><a href="<?= base_url('order_type'); ?>">Tipe Order</a></li>
                                 <li><a href="<?= base_url('pengelola'); ?>">Pengelola</a></li>

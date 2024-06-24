@@ -77,6 +77,7 @@ $routes->post('invoice/outstanding_invoice_list', 'Invoice::outstanding_invoice_
 $routes->post('invoice/update_invoice_header', 'Invoice::update_invoice_header');
 $routes->post('invoice/upload_invoice', 'Invoice::upload_invoice');
 $routes->post('invoice/update_uploaded_invoice', 'Invoice::update_uploaded_invoice');
+$routes->post('invoice/update_selected_outstanding_invoice', 'Invoice::update_selected_outstanding_invoice');
 
 // PAJAK
 $routes->get('pajak', 'Pajak::pajak_page');
