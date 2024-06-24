@@ -24,6 +24,9 @@ $routes->post('resto/simpan_form_resto', 'Resto::save_form_resto');
 $routes->post('resto/get_data_by_id', 'Resto::get_data_by_id');
 $routes->post('resto/update_form_resto', 'Resto::update_form_resto');
 
+// GROUP RESTO
+$routes->get('group_resto', 'Resto::group_resto_page');
+
 // TARIF PARKIR
 $routes->get('tarif_parkir', 'Parkir::tarif_parkir_page');
 $routes->get('tarif_parkir/get_all', 'Parkir::get_tarif_parkir_list');
