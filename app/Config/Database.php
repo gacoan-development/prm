@@ -27,7 +27,7 @@ class Database extends Config
     public array $default = [
         'DSN'          => '',
         'hostname'     => 'localhost',
-        'username'     => 'root',
+        'username'     => 'miegacoa',
         'password'     => '',
         'database'     => 'miegacoa_prm',
         'DBDriver'     => 'MySQLi',
