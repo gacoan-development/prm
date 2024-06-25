@@ -141,7 +141,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="col-lg-12 mt-3" style="overflow: auto;">
+                        <div class="col-lg-12 mt-3" style="overflow: auto;" id="div_invoice_outstanding">
                             <h6 class="text-center">List Invoice Oustanding</h6>
                             <table class="table table-bordered table-hover" id="tabel_invoice_outstanding">
                                 <thead class="text-center bg-danger">
@@ -849,7 +849,7 @@ $('.batal_form_invoice').click(function(){
 });
 
 $(document).off('click', '#cetak_form_invoice').on('click', '#cetak_form_invoice', function(){
-    update_invoice_header();
+    update_invoice_header(print_type);
     var url;
     var branch_id = $(document).find('[name="nama_resto"]').val();
     var inv_date = $(document).find('[name="tgl_invoice"]').val();
@@ -890,10 +890,11 @@ $(document).off('click', '#cetak_form_invoice').on('click', '#cetak_form_invoice
 });
 
 $(document).off('click', '#simpan_form_invoice').on('click', '#simpan_form_invoice', function(){
-    update_invoice_header();
+    update_invoice_header(print_type);
 });
 
-function update_invoice_header(){
+function update_invoice_header(print_type){
+    // if print_type == 1, itu berarti flat. If print_type == 2, itu berarti format persenan
     var branch_id = $(document).find('[name="nama_resto"]').val();
     var inv_date = $(document).find('[name="tgl_invoice"]').val();
     var inv_note = $(document).find('[name="ket_invoice"]').val();
@@ -903,7 +904,7 @@ function update_invoice_header(){
     $.ajax({
         async: false,
         type: "POST",
-        url: "<?= base_url('invoice/update_invoice_header') ?>",
+        url: "<?//= base_url('invoice/update_invoice_header') ?>",
         data: {
             branch_id: branch_id,
             inv_date: inv_date,
@@ -934,6 +935,65 @@ function update_invoice_header(){
             }
         }
     });
+    if(print_type == 2){
+        var compInvoiceDetail = [];
+        $(document).find('#tabel_detail_persen tbody tr').each(function(index, element){
+            var order_id = $(element).find('.total_per_order').data('order-id');
+            var fee_id = $(element).find('.total_per_order').data('fee-id');
+            var bill_parking_fee = $(element).find('.fee_nominal').data('nominal');
+            var amount_of_bill = $(element).find('.bill_amount').val();
+            var amount_of_income = $(element).find('.total_per_order').val();
+
+            compInvoiceDetail.push({
+                order_id: order_id,
+                fee_id: fee_id,
+                bill_parking_fee: bill_parking_fee,
+                amount_of_bill: amount_of_bill,
+                amount_of_income: amount_of_income
+            })
+        })
+        // console.log(compInvoiceDetail);
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "<?= base_url('invoice/update_invoice_detail'); ?>",
+            data: {
+                compInvoiceDetail: compInvoiceDetail,
+                branch_id: branch_id,
+                inv_date: inv_date,
+                user_nik: user_nik
+            },
+            dataType: "JSON",
+            success: function (response) {
+                // console.log(response);
+                if(response == '1'){
+                    // Swal.fire({
+                    //     icon: "success",
+                    //     title: "Berhasil!",
+                    //     text: "Berhasil mengunggah file!",
+                    //     allowOutsideClick: false,
+                    //     showConfirmButton: true
+                    // })
+                    // .then((feedback)=>{
+                    //     if(feedback.isConfirmed){
+                    //         window.location = "<?//= base_url('invoice/form_invoice') ?>";
+                    //     }
+                    // })
+                }else{
+                    // Swal.fire({
+                    //     icon: "error",
+                    //     title: "Gagal!",
+                    //     text: "Gagal mengunggah file!",
+                    //     allowOutsideClick: false,
+                    //     showConfirmButton: true
+                    // })
+                    // .then((feedback)=>{
+                        
+                    // })
+                }
+            }
+        });
+    }
 }
 
 $(document).off('keyup', '.number').on('keyup', '.number', function(){
@@ -1222,6 +1282,7 @@ function load_invoice(branch_id, inv_date){
             $(document).find('#terutang_invoice').html(terutang);
             if(inv_attachment != null && inv_attachment != ''){
                 $(document).find('.invoice_now_setor').remove();
+                $('#div_invoice_outstanding').addClass('d-none');
             }
             $.ajax({
                 async: false,
@@ -1279,7 +1340,7 @@ function load_invoice(branch_id, inv_date){
                                             '<td class="text-center">'+order_type_fee+'</td>'+
                                             '<td class="text-center fee_nominal" data-nominal="'+response[keys].fee_nominal+'">'+rupiah+response[keys].fee_nominal+persen+'</td>'+
                                             '<td><input type="text" class="form-control form-control-sm text-center bill_amount"></td>'+
-                                            '<td><input class="form-control form-control-sm text-center total_per_order" readOnly value="0"></td>'+
+                                            '<td><input class="form-control form-control-sm text-center total_per_order" data-order-id="'+response[keys].order_id+'" data-fee-id="'+response[keys].fee_id+'" readOnly value="0"></td>'+
                                         '</tr>';
                             }
                             $(document).find('table#tabel_detail_persen tbody').empty().append(html);

@@ -7,7 +7,7 @@
         <div class="col-lg-12">
             <div class="card border-dark mt-2">
                 <div class="card-header p-1 border-dark bg-primary text-white text-center">
-                    FORM TIPE ORDER
+                    FORM GROUP RESTO
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -15,20 +15,20 @@
                             <table class="table-condensed table-hover mb-3" width="60%">
                                 <tbody>
                                     <tr>
-                                        <td>Kode Order</td>
+                                        <td>Kode Group Resto</td>
                                         <td>:</td>
                                         <td>
-                                            <input type="text" class="form-control form-control-sm serialize" name="kode_order" aria-label="Sizing example input" data-title="Kode Order" aria-describedby="kode_order" value="TBA" readOnly>
+                                            <input type="text" class="form-control form-control-sm serialize" name="kode_branch_group" aria-label="Sizing example input" data-title="Kode Branch Group" aria-describedby="kode_branch_group" value="TBA" readOnly>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Nama Order</td>
+                                        <td>Nama Group Resto</td>
                                         <td>:</td>
                                         <td>
-                                            <input type="text" class="form-control form-control-sm required serialize" name="nama_order" aria-label="Sizing example input" data-title="Nama Order" aria-describedby="nama_order">
+                                            <input type="text" class="form-control form-control-sm required serialize" name="nama_group_resto" aria-label="Sizing example input" data-title="Nama Group Resto" aria-describedby="nama_group_resto">
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <!-- <tr>
                                         <td>Jenis Layanan Order</td>
                                         <td>:</td>
                                         <td>
@@ -38,13 +38,13 @@
                                                 <option value="REGULAR">REGULAR</option>
                                             </select>
                                         </td>
-                                    </tr>
+                                    </tr> -->
                                 </tbody>
                             </table>
                         </div>
                         <div class="col-lg-12 text-center">
-                            <button type="button" class="btn btn-sm btn-success" id="simpan_form_order">SIMPAN</button>
-                            <button type="button" class="btn btn-sm btn-danger" id="batal_form_order">BATAL</button>
+                            <button type="button" class="btn btn-sm btn-success" id="simpan_form_group_resto">SIMPAN</button>
+                            <button type="button" class="btn btn-sm btn-danger" id="batal_form_group_resto">BATAL</button>
                         </div>
                     </div>
                 </div>
@@ -55,22 +55,23 @@
 <script>
 $(document).ready(function () {
     // autofill
-    var order_id = '<?= $this->data['order_id']; ?>';
-    if(order_id != ''){ 
+    var branch_group_id = '<?= $this->data['branch_group_id']; ?>';
+    if(branch_group_id != ''){ 
         $.ajax({
+            async: false,
             type: "POST",
-            url: "<?= base_url('order_type/get_data_by_id'); ?>",
+            url: "<?= base_url('group_resto/get_data_by_id'); ?>",
             data: {
-                order_id: order_id
+                branch_group_id: branch_group_id
             },
             dataType: "JSON",
             success: function (response) {
                 console.log(response);
                 if(response.length > 0){
                     var data = response[0];
-                    $(document).find('[name="kode_order"]').val(response[0].order_code);
-                    $(document).find('[name="nama_order"]').val(response[0].order_name);
-                    $(document).find('[name="jenis_layanan_order"]').val(response[0].order_service);
+                    $(document).find('[name="kode_branch_group"]').val(response[0].branch_group_code);
+                    $(document).find('[name="nama_group_resto"]').val(response[0].branch_group_name);
+                    // $(document).find('[name="jenis_layanan_order"]').val(response[0].order_service);
                     // $(document).find('[name="alamat_resto"]').val(response[0].branch_address);
                     // $(document).find('[name="keaktifan"][value="'+response[0].is_active+'"]').trigger('click');
                     // $(document).find('[name="pengelola_parkir"]').append('<option value="'+response[0].parkmanagement_id+'">'+response[0].parkmanagement_name+'</option>').trigger('change');
@@ -80,7 +81,7 @@ $(document).ready(function () {
     }
 });
 
-$('button#simpan_form_order').off('click').on('click', function(){
+$('button#simpan_form_group_resto').off('click').on('click', function(){
     var passed = true;
     var not_passed_comp = [];
     $('.required').each(function(index, element){
@@ -105,17 +106,17 @@ $('button#simpan_form_order').off('click').on('click', function(){
     if(passed){
         var data = $('.serialize').serializeArray();
         var user_nik = '<?= $session->get('user_nik') ?>';
-        var order_id = '<?= $this->data['order_id']; ?>';
-        if(order_id != ''){ // update
-            var url = "<?= base_url('order_type/update_form_order'); ?>";
+        var branch_group_id = '<?= $this->data['branch_group_id']; ?>';
+        if(branch_group_id != ''){ // update
+            var url = "<?= base_url('group_resto/update_form_group_resto'); ?>";
             data = {
                 data: data,
                 user_nik: user_nik,
-                order_id: order_id
+                branch_group_id: branch_group_id
             };
             var message_status = 'update';
         }else{ // insert
-            var url = "<?= base_url('order_type/simpan_form_order'); ?>";
+            var url = "<?= base_url('group_resto/simpan_form_group_resto'); ?>";
             data = {
                 data: data,
                 user_nik: user_nik
@@ -133,20 +134,20 @@ $('button#simpan_form_order').off('click').on('click', function(){
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
-                        text: "Berhasil "+message_status+" data order.",
+                        text: "Berhasil "+message_status+" data group resto.",
                         allowOutsideClick: false,
                         showConfirmButton: true
                     })
                     .then((feedback)=>{
                         if(feedback.isConfirmed){
-                            window.location = "<?= base_url('order_type') ?>";
+                            window.location = "<?= base_url('group_resto') ?>";
                         }
                     })
                 }else{
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
-                        text: "Gagal "+message_status+" data order.",
+                        text: "Gagal "+message_status+" data group resto.",
                         allowOutsideClick: false,
                         showConfirmButton: true
                     })
@@ -168,7 +169,7 @@ $('button#simpan_form_order').off('click').on('click', function(){
     }
 })
 
-$('#batal_form_order').click(function(){
+$('#batal_form_group_resto').click(function(){
     Swal.fire({
         icon: "question",
         title: "Yakin?",
@@ -181,7 +182,7 @@ $('#batal_form_order').click(function(){
     })
     .then((choice)=>{
         if(choice.isConfirmed){
-            window.location = '<?= base_url('order_type'); ?>';
+            window.location = '<?= base_url('group_resto'); ?>';
         }else if(choice.isDenied){
             // do nothing
         }

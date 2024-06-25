@@ -25,7 +25,12 @@ $routes->post('resto/get_data_by_id', 'Resto::get_data_by_id');
 $routes->post('resto/update_form_resto', 'Resto::update_form_resto');
 
 // GROUP RESTO
-$routes->get('group_resto', 'Resto::group_resto_page');
+$routes->get('group_resto', 'GroupResto::group_resto_page');
+$routes->get('group_resto/get_all', 'GroupResto::get_group_resto_list');
+$routes->get('group_resto/form_group_resto', 'GroupResto::form_group_resto');
+$routes->post('group_resto/get_data_by_id', 'GroupResto::get_data_by_id');
+$routes->post('group_resto/simpan_form_group_resto', 'GroupResto::simpan_form_group_resto');
+$routes->post('group_resto/update_form_group_resto', 'GroupResto::update_form_group_resto');
 
 // TARIF PARKIR
 $routes->get('tarif_parkir', 'Parkir::tarif_parkir_page');
@@ -78,6 +83,7 @@ $routes->post('invoice/print_flat', 'Invoice::print_flat');
 $routes->post('invoice/print_persen', 'Invoice::print_persen');
 $routes->post('invoice/outstanding_invoice_list', 'Invoice::outstanding_invoice_list');
 $routes->post('invoice/update_invoice_header', 'Invoice::update_invoice_header');
+$routes->post('invoice/update_invoice_detail', 'Invoice::update_invoice_detail');
 $routes->post('invoice/upload_invoice', 'Invoice::upload_invoice');
 $routes->post('invoice/update_uploaded_invoice', 'Invoice::update_uploaded_invoice');
 $routes->post('invoice/update_selected_outstanding_invoice', 'Invoice::update_selected_outstanding_invoice');
@@ -85,3 +91,9 @@ $routes->post('invoice/update_selected_outstanding_invoice', 'Invoice::update_se
 // PAJAK
 $routes->get('pajak', 'Pajak::pajak_page');
 $routes->get('pajak/get_all', 'Pajak::get_pajak_list');
+$routes->post('pajak/get_data_by_id', 'Pajak::get_data_by_id');
+$routes->get('pajak/form_pajak', 'Pajak::form_pajak');
+$routes->get('pajak/get_all_resto', 'Pajak::get_all_resto');
+$routes->post('pajak/simpan_form_pajak', 'Pajak::save_form_pajak');
+$routes->post('pajak/upload_pajak', 'Pajak::upload_pajak');
+$routes->post('pajak/update_attachment', 'Pajak::update_attachment');

@@ -1,6 +1,4 @@
-<?= $this->extend('layouts/main') ?>
-
-<?= $this->section('content') ?>
+<?= $this->include('layouts/header') ?>
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
@@ -9,7 +7,7 @@
         <div class="col-lg-12">
             <a type="button" class="btn btn-sm btn-primary" id="tambah_data_pajak" href="<?= base_url('pajak/form_pajak'); ?>">+ Tambah data pajak</a>
             <table id="table_master_monitoring_pajak" class="table table-bordered table-hover">
-                <thead class="bg-dark text-white text-center">
+                <thead class="bg-primary text-white text-center">
                     <tr>
                         <th>#</th>
                         <th>Nama Resto</th>
@@ -55,11 +53,14 @@
                     data: "taxpay_note"
                 },
                 {
-                    render: function(){
+                    data: {
+                        taxpay_id: "taxpay_id"
+                    },
+                    render: function(data){
                         var html = '<div class="text-center form-inline">'+
-                                        '<button type="button" class="btn btn-sm btn-dark"><i class="bi bi-eye"></i></button>&nbsp;'+
-                                        '<button type="button" class="btn btn-sm btn-primary"><i class="bi bi-pencil"></i></button>&nbsp;'+
-                                        '<button type="button" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>'+
+                                        // '<button type="button" class="btn btn-sm btn-dark"><i class="bi bi-eye"></i></button>&nbsp;'+
+                                        '<a type="button" class="btn btn-sm btn-primary px-3 py-1 edit_taxpay" href="<?= base_url('pajak/form_pajak'); ?>?id='+data.taxpay_id+'"><i class="bi bi-pencil"></i></a>&nbsp;'+
+                                        // '<button type="button" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>'+
                                     '</div>';
                         return html;
                     }
@@ -69,4 +70,4 @@
         // alert('ini adalah yang pertama');
     });
 </script>
-<?= $this->endSection() ?>
+<?= $this->include('layouts/footer') ?>

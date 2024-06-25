@@ -128,6 +128,16 @@ class Invoice extends BaseController
         return json_encode($result);
     }
 
+    public function update_invoice_detail(){
+        $branch_id = $this->request->getPost('branch_id');
+        $inv_date = $this->request->getPost('inv_date');
+        $user_nik = $this->request->getPost('user_nik');
+        $compInvoiceDetail = $this->request->getPost('compInvoiceDetail');
+        $minvoice = new M_invoice();
+        $result = $minvoice->update_invoice_detail($branch_id, $inv_date, $user_nik, $compInvoiceDetail);
+        return json_encode($result);
+    }
+
     public function upload_invoice(){
         $file = $this->request->getFile('invoice_file');
         

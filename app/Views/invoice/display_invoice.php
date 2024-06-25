@@ -44,10 +44,11 @@ $(document).ready(function () {
         changeYear: true
     });
     load_invoice_table();
+    $(document).off('change', '#tgl_invoice').on('change', '#tgl_invoice', function(){
+        $('#table_master_invoice').DataTable().ajax.reload();
+    })
 });
-$(document).off('change', '#tgl_invoice').on('change', '#tgl_invoice', function(){
-    $('#table_master_invoice').DataTable().ajax.reload();
-})
+
 function load_invoice_table(){
     $('table#table_master_invoice').dataTable({
         ajax: {

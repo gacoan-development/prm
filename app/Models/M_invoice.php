@@ -45,6 +45,7 @@ class M_invoice extends Model
         return $this->db->table('tfee_header a')
                         ->select('*, IF(NOW() BETWEEN a.fee_date_active AND a.fee_date_exp, "applied", "exp") AS fee_status')
                         ->where($where_params)
+                        ->orderBy('a.fee_id', 'DESC')
                         ->get()->getResult();
     }
 
@@ -131,6 +132,7 @@ class M_invoice extends Model
                         ->join('torder d', 'd.order_id = b.order_id', 'left')
                         ->select('*, IF(NOW() BETWEEN a.fee_date_active AND a.fee_date_exp, "applied", "exp") AS fee_status')
                         ->where($where_params)
+                        ->orderBy('a.fee_id', 'DESC')
                         ->get()->getResult();
     }
     
@@ -173,6 +175,75 @@ class M_invoice extends Model
         $this->db->table('tinvoice a')
                     ->where($where_params)
                     ->update($update_data);
+        return $this->db->affectedRows();
+    }
+
+    public function update_invoice_detail($branch_id, $inv_date, $user_nik, $compInvoiceDetail){
+        $inv_date = date('Y-m-d' ,strtotime($inv_date));
+        $where_params = [
+            'a.branch_id' => $branch_id,
+            'a.inv_date' => $inv_date
+        ];
+        $result_inv_id = $this->db->table('tinvoice a')
+                                    ->select('a.inv_id')
+                                    ->where($where_params)
+                                    ->get()->getResult();
+        $inv_id = $result_inv_id[0]->inv_id;
+
+        $where_params = [
+            'a.inv_id' => $inv_id
+        ];
+        $result_detail = $this->db->table('tinvoice_detail a')
+                                    // ->select('a.inv_id')
+                                    ->where($where_params)
+                                    ->get()->getResult();
+        if(count($result_detail) > 0){
+            // update
+            $where_params = [
+                'a.inv_id' => $inv_id
+            ];
+            foreach($compInvoiceDetail AS $key => $row_detail){
+                $order_id = $row_detail['order_id'];
+                $fee_id = $row_detail['fee_id'];
+                $amount_of_bill = $row_detail['amount_of_bill'];
+                $bill_parking_fee = $row_detail['bill_parking_fee'];
+                $amount_of_income = $row_detail['amount_of_income'];
+                $update_data = [
+                    'a.order_id' => $order_id,
+                    'a.fee_id' => $fee_id,
+                    'a.amount_of_bill' => $amount_of_bill,
+                    'a.bill_parking_fee' => $bill_parking_fee,
+                    'a.amount_of_income' => $amount_of_income,
+                    'a.modified_by' => $user_nik,
+                    'a.modified_date' => date('Y-m-d H:i:s')
+                ];
+                $this->db->table('tinvoice_detail a')
+                                ->where($where_params)
+                                ->update($update_data); 
+            }
+        }else{
+            // insert
+            foreach($compInvoiceDetail AS $key => $row_detail){
+                $order_id = $row_detail['order_id'];
+                $fee_id = $row_detail['fee_id'];
+                $amount_of_bill = $row_detail['amount_of_bill'];
+                $bill_parking_fee = $row_detail['bill_parking_fee'];
+                $amount_of_income = $row_detail['amount_of_income'];
+                $insert_data = [
+                    'inv_id' => $inv_id,
+                    'order_id' => $order_id,
+                    'branch_id' => $branch_id,
+                    'fee_id' => $fee_id,
+                    'amount_of_bill' => $amount_of_bill,
+                    'bill_parking_fee' => $bill_parking_fee,
+                    'amount_of_income' => $amount_of_income,
+                    'create_by' => $user_nik,
+                    'create_date' => date('Y-m-d H:i:s')
+                ];
+                $this->db->table('tinvoice_detail')
+                            ->insert($insert_data); 
+            }
+        }
         return $this->db->affectedRows();
     }
 
