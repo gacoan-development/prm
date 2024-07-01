@@ -31,7 +31,7 @@
                             <table class="table-condensed table-hover w-100">
                                 <tbody>
                                     <tr>
-                                        <td>Handphone</td>
+                                        <td>No. Handphone</td>
                                         <td>:</td>
                                         <td><input type="text" name="hp_pengelola_parkir" id="" data-title="No. Handphone Pengelola Parkir" class="form-control form-control-sm serialize required"></td>
                                     </tr>
@@ -39,11 +39,6 @@
                                         <td>No. KTP</td>
                                         <td>:</td>
                                         <td><input type="text" name="ktp_pengelola_parkir" id="" data-title="No. KTP Pengelola Parkir" class="form-control form-control-sm serialize required"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Lampiran</td>
-                                        <td>:</td>
-                                        <td><input type="text" name="lampiran_pengelola_parkir" id="" data-title="Lampiran Pengelola Parkir" class="form-control form-control-sm serialize"></td>
                                     </tr>
                                     <tr>
                                         <td>Status Keaktifan</td>
@@ -62,6 +57,17 @@
                                         <td>Keterangan</td>
                                         <td>:</td>
                                         <td><input type="text" name="keterangan_pengelola_parkir" id="" class="form-control form-control-sm serialize"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lampiran</td>
+                                        <td>:</td>
+                                        <td>
+                                            <div id="attachment_exist" class="d-none">
+                                                <button type="button" class="btn btn-sm btn-info" id="id_attachment" data-file="">Lihat lampiran</button>
+                                                <button type="button" class="btn btn-sm btn-danger px-1 py-0" id="delete_file"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                            <input type="file" class="form-control" name="pengelola_attachment" data-title="Lampiran Pengelola Parkir" id="">
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -170,8 +176,11 @@ $(document).ready(function () {
                     $(document).find('[name="ktp_pengelola_parkir"]').val(response[0].parkmanagement_nik);
                     $(document).find('[name="keterangan_pengelola_parkir"]').val(response[0].parkmanagement_note);
                     $(document).find('[name="keaktifan_pengelola_parkir"][value="'+response[0].is_active+'"]').trigger('click');
-                    // $(document).find('[name="keaktifan_pengelola_parkir"]').val(response[0].is_active);
-                    // $(document).find('[name="pengelola_parkir_pengelola"]').append('<option value="'+response[0].parkmanagement_id+'">'+response[0].parkmanagement_name+'</option>').trigger('change');
+                    if(response[0].additional_attachments != '' && response[0].additional_attachments != null){
+                        $(document).find('#attachment_exist').removeClass('d-none');
+                        $(document).find('#id_attachment').data('file', response[0].additional_attachments);
+                        $(document).find('[name="pengelola_attachment"]').addClass('d-none');
+                    }
                 }
             }
         });
@@ -361,7 +370,12 @@ $('button#simpan_form_pengelola').off('click').on('click', function(){
             dataType: "JSON",
             success: function (query_response) {
                 // console.log(query_response);
-                if(query_response == '1'){
+                if(query_response != '0'){
+                    if(vendor_id === ''){
+                        upload_pengelola_attachment(query_response);
+                    }else{
+                        upload_pengelola_attachment(vendor_id);
+                    }
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
@@ -379,6 +393,53 @@ $('button#simpan_form_pengelola').off('click').on('click', function(){
         });
     }
 })
+
+function upload_pengelola_attachment(vendor_id){
+    var file_attachment = $(document).find('[name="pengelola_attachment"]')[0].files[0];
+    const formData = new FormData();
+    formData.append('pengelola_file', file_attachment);
+
+    var uploadStatus = false;
+    var uploaded_filename = '';
+
+    // console.log($(document).find('.outstanding_invoice:checked').length);
+
+    $.ajax({
+        async: false,
+        type: "POST",
+        url: "<?= base_url('pengelola/upload_pengelola'); ?>",
+        data: formData,
+        processData: false, 
+        contentType: false,
+        dataType: "JSON",
+        success: function (response) {
+            // console.log(response);
+            if(response != 'Failed to upload'){
+                if (response.success) {
+                    uploadStatus = true; // Update the variable on success
+                    uploaded_filename = response.message; // Update the variable on success
+                    console.log('File uploaded successfully');
+                    $.ajax({
+                        async: false,
+                        type: "POST",
+                        url: "<?= base_url('pengelola/update_uploaded_pengelola'); ?>",
+                        data: {
+                            filename: uploaded_filename,
+                            vendor_id_upload: vendor_id,
+                        },
+                        dataType: "JSON",
+                        success: function (response) {
+                            console.log('filename updated to the table');
+                        }
+                    });
+                } else {
+                    uploadStatus = false; // Update the variable on failure
+                    console.error('Failed to upload file');
+                }
+            }
+        }
+    });
+}
 $('#batal_form_pengelola').click(function(){
     Swal.fire({
         icon: "question",
@@ -398,5 +459,44 @@ $('#batal_form_pengelola').click(function(){
         }
     })
 })
+
+$(document).off('click', '#id_attachment').on('click', '#id_attachment', function(){
+    var origin = 'pengelola';
+    var attachment = $(this).data('file');
+    imageUrl = '<?= base_url('file/viewFile/'); ?>'+origin+'/'+attachment;
+    window.open(imageUrl, '_blank');
+});
+
+$(document).off('click', '#delete_file').on('click', '#delete_file', function(){
+    Swal.fire({
+        icon: "question",
+        title: "Yakin?",
+        text: "Anda yakin untuk menghapus file lampiran?",
+        allowOutsideClick: false,
+        showDenyButton: true,
+        confirmButtonText: "Ya",
+        denyButtonText: "Tidak"
+    })
+    .then((feedback)=>{
+        if(feedback.isConfirmed){
+            $(document).find('#attachment_exist').remove();
+            $(document).find('[name="pengelola_attachment"]').removeClass('d-none');
+            var vendor_id = '<?= $this->data['parkmanagement_id']; ?>';
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "<?= base_url('pengelola/update_uploaded_pengelola'); ?>",
+                data: {
+                    filename: '',
+                    vendor_id_upload: vendor_id,
+                },
+                dataType: "JSON",
+                success: function (response) {
+                    console.log('filename updated to the table');
+                }
+            });
+        }
+    })
+});
 </script>
 <?= $this->include('layouts/footer') ?>

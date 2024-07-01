@@ -240,4 +240,15 @@ class M_pajak extends Model
                         ->where($where_params)
                         ->get()->getResult();
     }
+
+    public function update_uploaded_pajak($taxpay_id_upload, $filename){
+        $update_data = [
+            'a.taxpay_attachment' => $filename
+        ];
+        $this->db->table('ttaxpay a')
+                    ->where('a.taxpay_id', $taxpay_id_upload)
+                    ->update($update_data);
+        $affected_rows = $this->db->affectedRows();
+        return $affected_rows;
+    }
 }

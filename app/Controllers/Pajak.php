@@ -89,4 +89,12 @@ class Pajak extends BaseController
             return 'code_clear';
         }
     }
+
+    public function update_uploaded_pajak(){
+        $taxpay_id_upload = $this->request->getPost('taxpay_id_upload');
+        $filename = $this->request->getPost('filename');
+        $mpajak = new M_pajak();
+        $result = $mpajak->update_uploaded_pajak($taxpay_id_upload, $filename);
+        return json_encode($result);
+    }
 }

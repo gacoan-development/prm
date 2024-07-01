@@ -20,25 +20,26 @@
                     <ul>
                         <li class="sidebar-list"> <a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="database"></i><span>Master </span></a>
                             <ul class="sidebar-submenu">
-                                <li><a href="<?= base_url('resto'); ?>">Data Resto</a></li>
-                                <li><a href="<?= base_url('group_resto'); ?>">Group Resto</a></li>
-                                <li><a href="<?= base_url('tarif_parkir'); ?>">Tarif Parkir</a></li>
-                                <li><a href="<?= base_url('order_type'); ?>">Tipe Order</a></li>
+                                <!-- <li><a href="<?//= base_url('resto'); ?>">Data Resto</a></li> -->
+                                <!-- <li><a href="<?//= base_url('group_resto'); ?>">Group Resto</a></li> -->
                                 <li><a href="<?= base_url('pengelola'); ?>">Pengelola</a></li>
+                                <li><a href="<?= base_url('tarif_parkir'); ?>">Tarif Parkir</a></li>
+                                <!-- <li><a href="<?//= base_url('order_type'); ?>">Tipe Order</a></li> -->
+                                
                             </ul>
                         </li>
                         <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="dollar-sign"></i><span>Transaksi</span></a>
                             <ul class="sidebar-submenu">
                                 <li><a href="<?= base_url('invoice'); ?>">Penagihan</a></li>        
-                                <li><a href="<?= base_url('invoice/form_invoice'); ?>">Form Penagihan</a></li>
+                                <!-- <li><a href="<?// = base_url('invoice/form_invoice'); ?>">Form Penagihan</a></li> -->
                                 <!-- <li><a href="<?= base_url('invoice/resto_dashboard_invoice'); ?>">Kalender Penagihan Resto (Prototype)</a></li> -->
                                 <li><a href="<?= base_url('pajak'); ?>">Monitoring Pembayaran Pajak</a></li>
                             </ul>
                         </li>
                         <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="file-text"></i><span>Laporan</span></a>
                             <ul class="sidebar-submenu">
-                                <!-- <li><a href="<?= base_url('invoice'); ?>">Penagihan</a></li> -->
-                                <li><a href="#"><i>Receive Fee</i></a></li>
+                                <!-- <li><a href="<?//= base_url('invoice'); ?>">Penagihan</a></li> -->
+                                <li><a href="<?= base_url('report/receive_fee'); ?>"><i>Receive Fee</i></a></li>
                                 <!-- <li><a href="layout-rtl.html">RTL</a></li>
                                 <li><a href="layout-dark.html">Dark Layout</a></li>
                                 <li><a href="hide-on-scroll.html">Hide Nav Scroll</a></li>

@@ -82,20 +82,60 @@
                 },
                 {
                     data: {
-                        parkmanagement_id: "parkmanagement_id"
+                        parkmanagement_id: "parkmanagement_id",
+                        additional_attachments: "additional_attachments"
                     },
                     render: function(data){
-                        var html = '<div class="text-center form-inline">'+
-                                        // '<button type="button" class="btn btn-sm btn-dark px-3 py-1"><i class="bi bi-eye"></i></button>&nbsp;'+
-                                        '<a type="button" class="btn btn-sm btn-primary px-3 py-1" href="<?= base_url('pengelola/form_pengelola'); ?>?vendor='+data.parkmanagement_id+'"><i class="bi bi-pencil"></i></a>&nbsp;'+
+                        if(data.additional_attachments != '' && data.additional_attachments != null){
+                            var view_html = '<button type="button" class="btn btn-sm btn-dark px-1 py-0 attachment" data-attachment="'+data.additional_attachments+'"><i class="bi bi-file-earmark-image"></i></button>&nbsp;';
+                        }else{
+                            var view_html = '';
+                        }
+                        var html = '<div class="form-inline">'+
+                                        view_html+
+                                        '<a type="button" class="btn btn-sm btn-primary px-1 py-0" href="<?= base_url('pengelola/form_pengelola'); ?>?vendor='+data.parkmanagement_id+'"><i class="bi bi-pencil"></i></a>&nbsp;'+
                                         // '<button type="button" class="btn btn-sm btn-danger px-3 py-1"><i class="bi bi-trash"></i></button>'+
                                     '</div>';
                         return html;
                     }
                 }
-            ]
+            ],
+            "language": {
+                "sProcessing":    "Memproses...",
+                "sLengthMenu":    "Menampilkan _MENU_ baris",
+                "sZeroRecords":   "Tidak ada data",
+                "sEmptyTable":    "Tidak ada data yang tersedia di tabel ini",
+                "sInfo":          "Menampilkan baris _START_ sampai _END_ dari _TOTAL_ data",
+                "sInfoEmpty":     "Menampilkan baris 0 sampai 0 dari 0 data",
+                "sInfoFiltered":  "(disaring dari _MAX_ data)",
+                "sInfoPostFix":   "",
+                "sSearch":        "Cari:",
+                "sUrl":           "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Memuat...",
+                "oPaginate": {
+                    "sFirst":    "Awal",
+                    "sLast":    "Akhir",
+                    "sNext":    "Berikutnya",
+                    "sPrevious": "Sebelumya"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Aktifkan untuk mengurutkan kolom dalam urutan menaik",
+                    "sSortDescending": ": Aktifkan untuk mengurutkan kolom dalam urutan menurun"
+                }
+            },
+            columnDefs: [
+                // { className: 'text-right', targets: [7, 10, 11, 14, 16] },
+                { className: 'text-center', targets: [6] },
+            ],
         });
         // alert('ini adalah yang pertama');
     });
+    $(document).off('click', '.attachment').on('click', '.attachment', function(){
+        var origin = 'pengelola';
+        var attachment = $(this).data('attachment');
+        imageUrl = '<?= base_url('file/viewFile/'); ?>'+origin+'/'+attachment;
+        window.open(imageUrl, '_blank');
+    })
 </script>
 <?= $this->include('layouts/footer') ?>

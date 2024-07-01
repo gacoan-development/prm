@@ -9,7 +9,7 @@ class M_pengelola extends Model
             // 'a.is_active' => '1'
         );
         return $this->db->table('tparkmanagement a')
-                        ->select('a.parkmanagement_id, a.parkmanagement_code, a.parkmanagement_name, a.parkmanagement_num, a.parkmanagement_nik, a.is_active')
+                        ->select('a.parkmanagement_id, a.parkmanagement_code, a.parkmanagement_name, a.parkmanagement_num, a.parkmanagement_nik, a.is_active, a.additional_attachments')
                         ->select('GROUP_CONCAT(b.branch_name SEPARATOR "?") AS branch_name')
                         ->join('tbranch b', 'b.parkmanagement_id = a.parkmanagement_id', 'left')
                         ->where($where_params)
@@ -47,7 +47,7 @@ class M_pengelola extends Model
             // 'a.is_active' => '1'
         ];
         return $this->db->table('tparkmanagement a')
-                        ->select('a.parkmanagement_id, a.parkmanagement_code, a.parkmanagement_name, a.parkmanagement_num, a.parkmanagement_nik, a.is_active')
+                        ->select('a.parkmanagement_id, a.parkmanagement_code, a.parkmanagement_name, a.parkmanagement_num, a.parkmanagement_nik, a.is_active, a.additional_attachments, a.parkmanagement_note')
                         ->where($where_params)
                         ->get()->getResult();
     }
@@ -139,10 +139,11 @@ class M_pengelola extends Model
                 }
             }
             $affected_detail = $this->db->affectedRows();
-            return $affected_detail;
+            // return $affected_detail;
         }else{
-            return $affected_header;
+            // return $affected_header;
         }
+        return $last_insert_id;
     }
 
     public function update_form_pengelola($data, $user_nik, $vendor_id){
@@ -240,6 +241,17 @@ class M_pengelola extends Model
         }else{
             return $affected_header;
         }
+    }
+
+    public function update_uploaded_pengelola($vendor_id_upload, $filename){
+        $update_data = [
+            'a.additional_attachments' => $filename
+        ];
+        $this->db->table('tparkmanagement a')
+                    ->where('a.parkmanagement_id', $vendor_id_upload)
+                    ->update($update_data);
+        $affected_rows = $this->db->affectedRows();
+        return $affected_rows;
     }
 }
 ?>

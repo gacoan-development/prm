@@ -8,7 +8,7 @@ class Parkir extends BaseController
         return view('parkir/display_tarif_parkir');
     }
 
-    public function get_tarif_parkir_list(){
+    public function get_all(){
         $mparkir = new M_parkir();
         $result = $mparkir->get_all();
         return json_encode($result);
@@ -91,6 +91,34 @@ class Parkir extends BaseController
         }else{
             return 'code_clear';
         }
+    }
+
+    public function check_fee_active(){
+        $branch_id = $this->request->getPost('branch_id');
+        $mparkir = new M_parkir();
+        $result = $mparkir->check_fee_active($branch_id);
+        echo json_encode($result);
+    }
+
+    public function upload_tarif(){
+        $file = $this->request->getFile('tarif_file');
+        
+        if ($file->isValid() && !$file->hasMoved()) {
+            $newName = $file->getRandomName(); // Generate a random name
+            $file->move(WRITEPATH . 'fee_attachments', $newName); // Move the file to the upload directory
+
+            return $this->response->setJSON(['success' => true, 'message' => $newName]);
+        } else {
+            return $this->response->setJSON(['success' => false, 'message' => 'Failed to upload data']);
+        }
+    }
+
+    public function update_uploaded_tarif(){
+        $fee_id_upload = $this->request->getPost('fee_id_upload');
+        $filename = $this->request->getPost('filename');
+        $mparkir = new M_parkir();
+        $result = $mparkir->update_uploaded_tarif($fee_id_upload, $filename);
+        return json_encode($result);
     }
 }
 ?>

@@ -15,18 +15,18 @@
                 <thead class="bg-primary text-white text-center">
                     <tr>
                         <th rowspan="2">#</th>
-                        <th rowspan="2">No. Fee</th>
-                        <th rowspan="2">Date</th>
-                        <th rowspan="2">Branch Name</th>
-                        <th rowspan="2">Region</th>
-                        <th colspan="2">Amount</th>
+                        <th rowspan="2">No. Tagihan</th>
+                        <th rowspan="2">Tanggal</th>
+                        <th rowspan="2">Nama Cabang</th>
+                        <th rowspan="2">Area</th>
+                        <th colspan="2">Jumlah</th>
                         <th rowspan="2">Status</th>
-                        <th rowspan="2">Procentage</th>
-                        <th rowspan="2">Action</th>
+                        <th rowspan="2">Persentase</th>
+                        <th rowspan="2">Aksi</th>
                     </tr>
                     <tr>
-                        <th>Billed</th>
-                        <th>Paid</th>
+                        <th>Tertagih</th>
+                        <th>Terbayar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -102,20 +102,56 @@ function load_invoice_table(){
                     pay_off_nominal: "pay_off_nominal"
                 },
                 render: function(data){
-                    return parseFloat((parseInt(data.pay_off_nominal)/parseInt(data.billed_nominal))*100).toFixed(2)+' %';
+                    if(parseInt(data.pay_off_nominal) != 0 && parseInt(data.billed_nominal) != 0){
+                        return parseFloat((parseInt(data.pay_off_nominal)/parseInt(data.billed_nominal))*100).toFixed(2)+' %';
+                    }else{
+                        return '0 %';
+                    }
                 }
             },
             {
-                render: function(){
+                data: {
+                    'inv_id': 'inv_id'
+                },
+                render: function(data){
                     var html = '<div class="text-center form-inline">'+
-                                    '<button type="button" class="btn btn-sm btn-dark px-3 py-1"><i class="bi bi-eye"></i></button>&nbsp;'+
-                                    '<button type="button" class="btn btn-sm btn-primary px-3 py-1"><i class="bi bi-pencil"></i></button>&nbsp;'+
-                                    '<button type="button" class="btn btn-sm btn-danger px-3 py-1"><i class="bi bi-trash"></i></button>'+
+                                    // '<button type="button" class="btn btn-sm btn-dark px-3 py-1"><i class="bi bi-eye"></i></button>&nbsp;'+
+                                    // '<button type="button" class="btn btn-sm btn-primary px-3 py-1"><i class="bi bi-pencil"></i></button>&nbsp;'+
+                                    '<a type="button" class="btn btn-sm btn-primary px-1 py-0" href="<?= base_url('invoice/form_invoice'); ?>?invoice='+data.inv_id+'"><i class="bi bi-pencil"></i></a>&nbsp;'+
+                                    // '<button type="button" class="btn btn-sm btn-danger px-3 py-1"><i class="bi bi-trash"></i></button>'+
                                 '</div>';
                     return html;
                 }
             }
-        ]
+        ],
+        "language": {
+            "sProcessing":    "Memproses...",
+            "sLengthMenu":    "Menampilkan _MENU_ baris",
+            "sZeroRecords":   "Tidak ada data",
+            "sEmptyTable":    "Tidak ada data yang tersedia di tabel ini",
+            "sInfo":          "Menampilkan baris _START_ sampai _END_ dari _TOTAL_ data",
+            "sInfoEmpty":     "Menampilkan baris 0 sampai 0 dari 0 data",
+            "sInfoFiltered":  "(disaring dari _MAX_ data)",
+            "sInfoPostFix":   "",
+            "sSearch":        "Cari:",
+            "sUrl":           "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Memuat...",
+            "oPaginate": {
+                "sFirst":    "Awal",
+                "sLast":    "Akhir",
+                "sNext":    "Berikutnya",
+                "sPrevious": "Sebelumya"
+            },
+            "oAria": {
+                "sSortAscending":  ": Aktifkan untuk mengurutkan kolom dalam urutan menaik",
+                "sSortDescending": ": Aktifkan untuk mengurutkan kolom dalam urutan menurun"
+            }
+        },
+        columnDefs: [
+            // { className: 'text-right', targets: [7, 10, 11, 14, 16] },
+            { className: 'text-center', targets: [2, 3, 4, 5, 6, 7, 8] },
+        ],
     });
 }
 </script>

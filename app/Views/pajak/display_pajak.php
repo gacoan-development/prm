@@ -65,7 +65,35 @@
                         return html;
                     }
                 }
-            ]
+            ],
+                "language": {
+                "sProcessing":    "Memproses...",
+                "sLengthMenu":    "Menampilkan _MENU_ baris",
+                "sZeroRecords":   "Tidak ada data",
+                "sEmptyTable":    "Tidak ada data yang tersedia di tabel ini",
+                "sInfo":          "Menampilkan baris _START_ sampai _END_ dari _TOTAL_ data",
+                "sInfoEmpty":     "Menampilkan baris 0 sampai 0 dari 0 data",
+                "sInfoFiltered":  "(disaring dari _MAX_ data)",
+                "sInfoPostFix":   "",
+                "sSearch":        "Cari:",
+                "sUrl":           "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Memuat...",
+                "oPaginate": {
+                    "sFirst":    "Awal",
+                    "sLast":    "Akhir",
+                    "sNext":    "Berikutnya",
+                    "sPrevious": "Sebelumya"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Aktifkan untuk mengurutkan kolom dalam urutan menaik",
+                    "sSortDescending": ": Aktifkan untuk mengurutkan kolom dalam urutan menurun"
+                }
+            },
+            columnDefs: [
+                // { className: 'text-right', targets: [7, 10, 11, 14, 16] },
+                { className: 'text-center', targets: [4] },
+            ],
         });
         // alert('ini adalah yang pertama');
     });

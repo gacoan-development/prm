@@ -2,6 +2,14 @@
 <?php 
     $session = \Config\Services::session();
 ?>
+<style>
+    /* .ui-datepicker-calendar {
+        display: none;
+        }
+    .ui-widget {
+        font-size:.7em;
+    } */
+</style>
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
@@ -77,6 +85,13 @@
                                         </td>
                                     </tr> -->
                                     <tr>
+                                        <td>Periode</td>
+                                        <td>:</td>
+                                        <td>
+                                            <input type="text" name="periode_pajak" id="periode_pajak" class="form-control form-control-sm text-center serialize datepicker" value="<?= date('d-m-Y'); ?>">
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>Catatan</td>
                                         <td>:</td>
                                         <td>
@@ -86,7 +101,14 @@
                                     <tr>
                                         <td>Lampiran</td>
                                         <td>:</td>
-                                        <td><input type="file" class="form-control" name="taxpay_attachment" id=""></td>
+                                        <td>
+                                            <div id="attachment_exist" class="d-none">
+                                                <button type="button" class="btn btn-sm btn-info" id="id_attachment" data-file="">Lihat lampiran</button>
+                                                <button type="button" class="btn btn-sm btn-danger px-1 py-0" id="delete_file"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                            <!-- <input type="file" class="form-control" name="pengelola_attachment" data-title="Lampiran Pengelola Parkir" id=""> -->
+                                            <input type="file" class="form-control" name="taxpay_attachment" data-title="Lampiran Pajak" id="">
+                                        </td>
                                         <!-- <td><input type="hidden" name="inv_id_upload"></td> -->
                                     </tr>
                                     <!-- <tr>
@@ -112,6 +134,11 @@
 <script>
 $(document).ready(function () {
     load_master_area();
+    $(document).find('.datepicker').datepicker({
+        dateFormat: 'dd-mm-yy',
+        changeMonth: true, 
+        changeYear: true
+    });
     $('[name="pengelola_parkir_resto"]').select2({
         tokenSeparators: [',', ' '],
         minimumInputLength: 1,
@@ -192,6 +219,11 @@ $(document).ready(function () {
                     // $(document).find('[name="branch_pos"]').val(response[0].branch_pos);
                     // $(document).find('[name="keaktifan"][value="'+response[0].is_active+'"]').trigger('click');
                     $(document).find('[name="nama_resto"]').append('<option value="'+response[0].branch_id+'">'+response[0].branch_name+'</option>').trigger('change');
+                    if(response[0].taxpay_attachment != '' && response[0].taxpay_attachment != null){
+                        $(document).find('#attachment_exist').removeClass('d-none');
+                        $(document).find('#id_attachment').data('file', response[0].taxpay_attachment);
+                        $(document).find('[name="taxpay_attachment"]').addClass('d-none');
+                    }
                 }
             }
         });
@@ -199,6 +231,7 @@ $(document).ready(function () {
 });
 
 $('button#simpan_form_pajak').off('click').on('click', function(){
+    var periode = $('[name="periode_pajak"]').val();
     var taxpay_code = $('[name="kode_taxpay"]').val();
     var taxpay_id = '<?= $this->data['taxpay_id']; ?>';
     var data = $('.serialize').serializeArray();
@@ -284,18 +317,18 @@ $('button#simpan_form_pajak').off('click').on('click', function(){
                         }
                     }
                 });
-                // Swal.fire({
-                //     icon: "success",
-                //     title: "Berhasil!",
-                //     text: "Berhasil "+message_status+" data pembayaran pajak.",
-                //     allowOutsideClick: false,
-                //     showConfirmButton: true
-                // })
-                // .then((feedback)=>{
-                //     if(feedback.isConfirmed){
-                //         window.location = "<?//= base_url('pajak') ?>";
-                //     }
-                // })
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil!",
+                    text: "Berhasil "+message_status+" data pembayaran pajak.",
+                    allowOutsideClick: false,
+                    showConfirmButton: true
+                })
+                .then((feedback)=>{
+                    if(feedback.isConfirmed){
+                        window.location = "<?= base_url('pajak') ?>";
+                    }
+                })
             }
         }
     });
@@ -412,5 +445,44 @@ function load_master_area(){
         }
     });
 }
+
+$(document).off('click', '#id_attachment').on('click', '#id_attachment', function(){
+    var origin = 'pajak';
+    var attachment = $(this).data('file');
+    imageUrl = '<?= base_url('file/viewFile/'); ?>'+origin+'/'+attachment;
+    window.open(imageUrl, '_blank');
+});
+
+$(document).off('click', '#delete_file').on('click', '#delete_file', function(){
+    Swal.fire({
+        icon: "question",
+        title: "Yakin?",
+        text: "Anda yakin untuk menghapus file lampiran?",
+        allowOutsideClick: false,
+        showDenyButton: true,
+        confirmButtonText: "Ya",
+        denyButtonText: "Tidak"
+    })
+    .then((feedback)=>{
+        if(feedback.isConfirmed){
+            $(document).find('#attachment_exist').remove();
+            $(document).find('[name="taxpay_attachment"]').removeClass('d-none');
+            var taxpay_id = '<?= $this->data['taxpay_id']; ?>';
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "<?= base_url('pajak/update_uploaded_pajak'); ?>",
+                data: {
+                    filename: '',
+                    taxpay_id_upload: taxpay_id,
+                },
+                dataType: "JSON",
+                success: function (response) {
+                    console.log('filename updated to the table');
+                }
+            });
+        }
+    })
+});
 </script>
 <?= $this->include('layouts/footer') ?>

@@ -16,9 +16,9 @@ class Invoice extends BaseController
     }
 
     public function form_invoice(){
-        $invoice_id = $this->request->getGet('invoice');
+        $inv_id = $this->request->getGet('invoice');
         $data = [
-            'invoice_id' => $invoice_id
+            'inv_id' => $inv_id
         ];
         return view('invoice/form_invoice', $data);
     }
@@ -105,7 +105,18 @@ class Invoice extends BaseController
     }
 
     public function print_persen(){
-        return view('invoice/print/persen');
+        $branch_id = $this->request->getPost('branch_id');
+        $inv_date = $this->request->getPost('inv_date');
+        $checked_id = $this->request->getPost('checked_outstanding_invoice');
+        $data = [];
+        $minvoice = new M_invoice();
+        $data['existing_invoice'] = $minvoice->load_detailed_invoice($branch_id, $inv_date);
+        if($checked_id != ''){
+            $data['selected_outstanding'] = $minvoice->selected_outstanding($checked_id);
+        }else{
+            $data['selected_outstanding'] = [];
+        }
+        return view('invoice/print/persen', $data);
     }
 
     public function outstanding_invoice_list(){
@@ -168,6 +179,7 @@ class Invoice extends BaseController
         $result = $minvoice->update_selected_outstanding_invoice($outstanding_compilation, $inv_id_upload);
         return json_encode($result);
     }
+    
 }
 
 ?>

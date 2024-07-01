@@ -9,8 +9,14 @@ class M_parkir extends Model
             // 'a.is_active' => '1'
         );
         return $this->db->table('tbranch a')
-                        ->select('a.branch_id, a.branch_code, a.branch_name, c.branch_group_name, d.fee_date_active, d.fee_date_exp, e.revenue_sharing_type, b.parkmanagement_name, d.fee_id')
-                        ->select('IF(NOW() BETWEEN d.fee_date_active AND d.fee_date_exp, "active", IF(d.fee_date_active IS NULL OR d.fee_date_exp IS NULL, "not_declared", "expired")) AS active_status')
+                        ->select('a.branch_id, a.branch_code, a.branch_name, c.branch_group_name, DATE_FORMAT(d.fee_date_active, "%d/%m/%Y") AS fee_date_active, DATE_FORMAT(d.fee_date_exp, "%d/%m/%Y") AS fee_date_exp, e.revenue_sharing_type, b.parkmanagement_name, d.fee_id')
+                        ->select('CASE 
+                                        WHEN DATEDIFF(d.fee_date_exp, NOW()) > 7 THEN "1_active"
+                                        WHEN d.fee_date_active IS NULL OR d.fee_date_exp IS NULL THEN "2_notdeclared"
+                                        WHEN DATEDIFF(d.fee_date_exp, NOW()) <= 7 AND DATEDIFF(d.fee_date_exp, NOW()) > 0 THEN "3_warning"
+                                        WHEN NOW() > d.fee_date_exp THEN "4_expired"
+                                        ELSE "5_notdetected"
+                                    END AS active_status')
                         ->join('tparkmanagement b', 'a.parkmanagement_id = b.parkmanagement_id')
                         ->join('tbranch_group c', 'c.branch_group_id = a.branch_group_id', 'left')
                         ->join('(SELECT
@@ -23,7 +29,7 @@ class M_parkir extends Model
                                     WHERE latest_fee_rank = 1) d', 'd.branch_id = a.branch_id', 'left')
                         ->join('tmaster_revenue e', 'e.id = d.revenue_id', 'left')
                         ->where($where_params)
-                        ->orderBy('a.branch_id', 'ASC')
+                        ->orderBy('active_status', 'DESC')
                         ->get()->getResult();
     }
 
@@ -43,7 +49,7 @@ class M_parkir extends Model
             'a.fee_id' => $fee_id
         ];
         return $this->db->table('tfee_header a')
-                        ->select('a.fee_id, a.fee_code, a.fee_name, DATE(a.fee_date_active) AS fee_date_active, DATE(a.fee_date_exp) AS fee_date_exp, 
+                        ->select('a.fee_id, a.fee_code, a.fee_name, DATE(a.fee_date_active) AS fee_date_active, DATE(a.fee_date_exp) AS fee_date_exp, a.attachment,
                                     a.is_active, a.fee_note, a.revenue_id, a.flat_nbill_nominal, b.*,
                                     IF(b.fee_det_id IS NULL, "no_detail", "detailed") AS detail_status')
                         ->join('tfee_detail b', 'b.fee_id = a.fee_id', 'left')
@@ -160,10 +166,11 @@ class M_parkir extends Model
                 
             }
             $affected_detail = $this->db->affectedRows();
-            return $affected_detail;
+            // return $affected_detail;
         }else{
-            return $affected_header;
+            // return $affected_header;
         }
+        return $last_insert_id;
     }
 
     public function update_form_tarif_parkir($fee_id, $data, $user_nik, $branch_id){
@@ -235,6 +242,33 @@ class M_parkir extends Model
         }else{
             return $affected_header;
         }
+    }
+
+    public function check_fee_active($branch_id){
+        $where_params = [
+            'a.branch_id' => $branch_id,
+        ];
+        return $this->db->table('tbranch a')
+                        ->select('a.branch_id, a.branch_code, a.branch_address, b.branch_group_name, c.parkmanagement_name, d.fee_id, d.fee_date_active, d.fee_date_exp')
+                        ->select('IF(NOW() BETWEEN d.fee_date_active AND d.fee_date_exp, "active", "expired") AS active_status')
+                        ->join('tbranch_group b', 'b.branch_group_id = a.branch_group_id', 'left')
+                        ->join('tparkmanagement c', 'c.parkmanagement_id = a.parkmanagement_id', 'left')
+                        ->join('tfee_header d', 'd.branch_id = a.branch_id', 'left')
+                        ->where($where_params)
+                        ->orderBy('d.fee_id', 'DESC')
+                        ->limit(1)
+                        ->get()->getResult();
+    }
+
+    public function update_uploaded_tarif($fee_id_upload, $filename){
+        $update_data = [
+            'a.attachment' => $filename
+        ];
+        $this->db->table('tfee_header a')
+                    ->where('a.fee_id', $fee_id_upload)
+                    ->update($update_data);
+        $affected_rows = $this->db->affectedRows();
+        return $affected_rows;
     }
 }
 ?>

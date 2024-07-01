@@ -41,7 +41,7 @@
                                         <td><div id="region_resto"> - </div></td>
                                     </tr>
                                     <tr>
-                                        <td>PIC</td>
+                                        <td>Pengelola</td>
                                         <td>:</td>
                                         <td><div id="pic_resto"> - </div></td>
                                     </tr>
@@ -123,7 +123,7 @@
                                     </thead>
                                 </table>
                             </div>
-                            <div id="div_tabel_detail_persen" class="d-none ms-5">
+                            <div id="receive_fee" class="d-none ms-5">
                                 <table class="table table-bordered table-hover" id="tabel_detail_persen">
                                     <thead class="text-center bg-primary">
                                         <tr>
@@ -132,7 +132,7 @@
                                             <th>Nama Order</th>
                                             <th>Tipe Tarif</th>
                                             <th>Nominal / Persen</th>
-                                            <th>Jumlah Bill</th>
+                                            <th>Jumlah Bill / Nominal Pendapatan</th>
                                             <th>Total</th>
                                         </tr>
                                     </thead>
@@ -337,7 +337,7 @@ $(document).ready(function () {
             },
             dataType: "JSON",
             success: function (response) {
-                // console.log(response);
+                console.log(response);
                 if(response.length > 0){
                     if(response[0].fee_status == 'applied'){
                         $.ajax({
@@ -363,11 +363,11 @@ $(document).ready(function () {
                         $(document).find('div#pic_resto').html(parkmanagement_name);
                         $(document).find('div#div_buat_penagihan').removeClass('d-none');
 
-                    }else if(response[0].fee_status == 'exp'){
+                    }else if(response[0].fee_status == 'not_applied'){
                         Swal.fire({
                             icon: "warning",
                             title: "Perhatian!",
-                            text: "Tarif parkir untuk resto ini sudah kadaluwarsa. Mohon untuk memperbarui data tarif parkir resto tsb.",
+                            text: "Tarif parkir untuk resto ini sudah kadaluwarsa / belum ada. Mohon untuk memperbarui data tarif parkir resto tsb.",
                             allowOutsideClick: false,
                             showConfirmButton: true
                         })
@@ -389,27 +389,27 @@ $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
 
     // autofill data resto
-    // var branch_id = '<?// = $this->data['branch_id']; ?>';
-    // if(branch_id != ''){ 
-    //     $.ajax({
-    //         async: false,
-    //         type: "POST",
-    //         url: "<?// = base_url('tarif_parkir/get_data_by_id'); ?>",
-    //         data: {
-    //             branch_id: branch_id
-    //         },
-    //         dataType: "JSON",
-    //         success: function (response) {
-    //             // console.log(response);
-    //             if(response.length > 0){
-    //                 $(document).find('#kode_resto').html(response[0].branch_code);
-    //                 $(document).find('#nama_resto').html(response[0].branch_name);
-    //                 $(document).find('#alamat_resto').html(response[0].branch_address);
-    //                 $(document).find('#region_resto').html(response[0].branch_group_name);
-    //             }
-    //         }
-    //     });
-    // }
+    var inv_id = '<?= $this->data['inv_id']; ?>';
+    if(branch_id != ''){ 
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "<?= base_url('invoice/get_data_by_id'); ?>",
+            data: {
+                branch_id: branch_id
+            },
+            dataType: "JSON",
+            success: function (response) {
+                // console.log(response);
+                if(response.length > 0){
+                    $(document).find('#kode_resto').html(response[0].branch_code);
+                    $(document).find('#nama_resto').html(response[0].branch_name);
+                    $(document).find('#alamat_resto').html(response[0].branch_address);
+                    $(document).find('#region_resto').html(response[0].branch_group_name);
+                }
+            }
+        });
+    }
     // autofill data tarif parkir
     // var fee_id = '<?// = $this->data['fee_id']; ?>';
     // if(fee_id != ''){ 
@@ -564,8 +564,17 @@ $(document).off('click', '#create_invoice').on('click', '#create_invoice', funct
 
 $(document).off('keyup', '.bill_amount').on('keyup', '.bill_amount', function(){
     var nominal = $(this).closest('tr').find('.fee_nominal').data('nominal');
+    var calculation_type = $(this).data('calculation-type');
+    // console.log(calculation_type);
 
-    var bill_amount = parseInt(nominal)*parseInt($(this).val());
+    switch(calculation_type){
+        case "F": // berarti flat, langsung dikalikan jumlah bill dan flat nya berapa
+            var bill_amount = parseInt(nominal)*parseInt($(this).val());
+        break;
+        case "P": // nominal persennya dibagi seratus dulu baru dikalikan dengan jumlah nominal rupiah pemasukan dari pengelola parkir
+            var bill_amount = (parseInt(nominal)/100)*parseInt($(this).val());
+        break;
+    }    
     $(this).closest('tr').find('.total_per_order').val(bill_amount);
 
     var sum = 0;
@@ -904,7 +913,7 @@ function update_invoice_header(print_type){
     $.ajax({
         async: false,
         type: "POST",
-        url: "<?//= base_url('invoice/update_invoice_header') ?>",
+        url: "<?= base_url('invoice/update_invoice_header') ?>",
         data: {
             branch_id: branch_id,
             inv_date: inv_date,
@@ -1280,10 +1289,6 @@ function load_invoice(branch_id, inv_date){
             $(document).find('#terbayar_invoice').html(rupiah(parseInt(response[0].pay_off_nominal)));
             var terutang = rupiah(parseInt(response[0].billed_nominal) - parseInt(response[0].pay_off_nominal));
             $(document).find('#terutang_invoice').html(terutang);
-            if(inv_attachment != null && inv_attachment != ''){
-                $(document).find('.invoice_now_setor').remove();
-                $('#div_invoice_outstanding').addClass('d-none');
-            }
             $.ajax({
                 async: false,
                 type: "POST",
@@ -1326,20 +1331,21 @@ function load_invoice(branch_id, inv_date){
                             for(var keys in response){
                                 if(response[keys].order_type_fee == 'F'){
                                     var order_type_fee = 'FLAT';
-                                    var rupiah = 'Rp. ';
-                                    var persen = ' ';
+                                    var nominal = rupiah(response[keys].fee_nominal);
                                 }else if(response[keys].order_type_fee == 'P'){
                                     var order_type_fee = 'PERCENTAGE';
-                                    var rupiah = ' ';
-                                    var persen = ' %';
+                                    var nominal = response[keys].fee_nominal+' %';
                                 }
                                 html += '<tr>'+
                                             '<td>'+(parseInt(keys)+1)+'</td>'+
                                             '<td>'+response[keys].order_code+'</td>'+
                                             '<td>'+response[keys].order_name+'</td>'+
                                             '<td class="text-center">'+order_type_fee+'</td>'+
-                                            '<td class="text-center fee_nominal" data-nominal="'+response[keys].fee_nominal+'">'+rupiah+response[keys].fee_nominal+persen+'</td>'+
-                                            '<td><input type="text" class="form-control form-control-sm text-center bill_amount"></td>'+
+                                            '<td class="text-center fee_nominal" data-nominal="'+response[keys].fee_nominal+'">'+nominal+'</td>'+
+                                            '<td>'+
+                                                
+                                                '<input type="text" class="form-control form-control-sm text-center bill_amount" data-calculation-type="'+response[keys].order_type_fee+'">'+
+                                            '</td>'+
                                             '<td><input class="form-control form-control-sm text-center total_per_order" data-order-id="'+response[keys].order_id+'" data-fee-id="'+response[keys].fee_id+'" readOnly value="0"></td>'+
                                         '</tr>';
                             }
@@ -1352,6 +1358,11 @@ function load_invoice(branch_id, inv_date){
                     }
                 }
             });
+            if(inv_attachment != null && inv_attachment != ''){
+                $(document).find('.invoice_now_setor').remove();
+                $('#div_invoice_outstanding').addClass('d-none');
+                $('#div_tabel_detail_persen').addClass('d-none');
+            }
         }
     });
 }

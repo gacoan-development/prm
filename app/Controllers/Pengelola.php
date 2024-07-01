@@ -89,5 +89,26 @@ class Pengelola extends BaseController
             return 'code_clear';
         }
     }
+
+    public function upload_pengelola(){
+        $file = $this->request->getFile('pengelola_file');
+        
+        if ($file->isValid() && !$file->hasMoved()) {
+            $newName = $file->getRandomName(); // Generate a random name
+            $file->move(WRITEPATH . 'vendor_attachments', $newName); // Move the file to the upload directory
+
+            return $this->response->setJSON(['success' => true, 'message' => $newName]);
+        } else {
+            return $this->response->setJSON(['success' => false, 'message' => 'Failed to upload data']);
+        }
+    }
+
+    public function update_uploaded_pengelola(){
+        $vendor_id_upload = $this->request->getPost('vendor_id_upload');
+        $filename = $this->request->getPost('filename');
+        $mpengelola = new M_pengelola();
+        $result = $mpengelola->update_uploaded_pengelola($vendor_id_upload, $filename);
+        return json_encode($result);
+    }
 }
 ?>

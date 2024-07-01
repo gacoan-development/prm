@@ -2,26 +2,31 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
-            <h4 class="text-center">DATA TARIF PARKIR (AKTIF)</h4>
+            <h4 class="text-center">DATA TARIF PARKIR</h4>
         </div>
-        <div class="col-lg-12">
-            <!-- <a type="button" class="btn btn-sm btn-primary" id="tambah_tarif_parkir" href="<?= base_url('tarif_parkir/form_parkir'); ?>">+ Tambah data tarif parkir</a> -->
+        <div class="col-lg-12" style="overflow: auto;">
+            <div class="text-end">
+                <button type="button" class="btn btn-sm px-3" style="background-color: #d4edda"></button>: Tarif berlaku &emsp;
+                <button type="button" class="btn btn-sm px-3" style="background-color: #fff3cd"></button>: Tarif < seminggu akan kadaluwarsa &emsp;
+                <button type="button" class="btn btn-sm px-3" style="background-color: #f8d7da"></button>: Tarif kadaluwarsa <br/>
+            </div>
+            <a type="button" class="btn btn-sm btn-primary" id="tambah_tarif_parkir" href="<?= base_url('tarif_parkir/form_parkir'); ?>">+ Tambah data tarif parkir</a>
             <table id="table_master_tarif_parkir" class="table table-bordered table-hover">
                 <thead class="bg-primary text-center text-white">
                     <tr>
                         <th rowspan="2">#</th>
-                        <th rowspan="2">Kode Cabang</th>
-                        <th rowspan="2">Nama Cabang</th>
-                        <th rowspan="2">Region</th>
-                        <th colspan="2">Tanggal Aktif</th>
-                        <th rowspan="2">Type Fee</th>
-                        <th rowspan="2">Pengelola</th>
-                        <th rowspan="2">Action</th>
+                        <th rowspan="2" class="text-center">Kode Cabang</th>
+                        <th rowspan="2" class="text-center">Nama Cabang</th>
+                        <th rowspan="2" class="text-center">Area</th>
+                        <th colspan="2" class="text-center">Tanggal Berlaku</th>
+                        <th rowspan="2" class="text-center">Jenis Tagihan</th>
+                        <th rowspan="2" class="text-center">Pengelola</th>
+                        <th rowspan="2" class="text-center">Aksi</th>
                     </tr>
                     <tr>
                         <!-- <td>Status</td> -->
-                        <td>Start</td>
-                        <td>End</td>
+                        <th class="text-center">Mulai</th>
+                        <th class="text-center">Berakhir</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,18 +66,26 @@
 </div>
 <script>
 $(document).ready(function () {
+    // $(document).find('[data-toggle="tooltip"]').tooltip();
     $('table#table_master_tarif_parkir').dataTable({
         ajax: {
             url: "<?= base_url('tarif_parkir/get_all'); ?>",
             dataSrc: ''
         },
         createdRow: function (row, data, dataIndex) {
-            switch(data['is_active']){
-                case "0":
-                    // $(row).css('background-color', '#ff0000');
-                    $(row).addClass('table-secondary');
+            switch(data['active_status']){
+                case "1_active": // aktif
+                    $(row).addClass('table-success');
                 break;
-                case "1":
+                case "2_notdeclared": // nggak ada fee header atau (fee header dan detailnya)
+                    // row warna putih
+                break;
+                case "3_warning": // waktu expired <= seminggu
+                    $(row).addClass('table-warning');
+                break;
+                case "4_expired": // now > waktu berakhir tarif parkir
+                    $(row).addClass('table-danger');
+                break;
                 default:
                     // $(row).addClass('table-success');
                 break;
@@ -92,24 +105,6 @@ $(document).ready(function () {
             {
                 data: "branch_group_name"
             },
-            // {
-            //     data: {
-            //         active_status: "active_status"
-            //     },
-            //     render: function(data){
-            //         switch(data.active_status){
-            //             case "not_declared":
-            //                 return 'Not Declared';
-            //             break;
-            //             case "active":
-            //                 return "Active";
-            //             break;
-            //             case "expired":
-            //                 return "Expired";
-            //             break;
-            //         }
-            //     }
-            // },
             {
                 data: {
                     fee_date_active: "fee_date_active"
@@ -148,24 +143,52 @@ $(document).ready(function () {
             {
                 data: {
                     branch_id: "branch_id",
-                    fee_id: "fee_id"
+                    fee_id: "fee_id",
+                    active_status: "active_status"
                 },
                 render: function(data){
                     var fee_id_param = '';
                     if(data.fee_id != null){
                         fee_id_param = '&fee='+data.fee_id;
                     }
+                    if(data.active_status != '3_warning' && data.active_status != '4_expired'){
+                        var edit_tarif_html = '<a type="button" class="btn btn-sm btn-primary px-3 py-1" href="<?= base_url('tarif_parkir/form_parkir'); ?>?branch='+data.branch_id+fee_id_param+'"><i class="bi bi-pencil"></i></a>&nbsp;';
+                    }else{
+                        var edit_tarif_html = '';
+                    }
                     var html = '<div class="text-center form-inline">'+
                                     '<button type="button" class="btn btn-sm btn-dark px-3 py-1 fee_history" data-branch-id="'+data.branch_id+'"><i class="bi bi-eye"></i></button>&nbsp;'+
-                                    '<a type="button" class="btn btn-sm btn-primary px-3 py-1" href="<?= base_url('tarif_parkir/form_parkir'); ?>?branch='+data.branch_id+fee_id_param+'"><i class="bi bi-pencil"></i></a>&nbsp;'+
-                                    // '<button type="button" class="btn btn-sm btn-danger px-3 py-1"><i class="bi bi-trash"></i></button>'+
+                                    edit_tarif_html+
                                 '</div>';
                     return html;
                 }
             }
-        ]
+        ],
+        "language": {
+            "sProcessing":    "Memproses...",
+            "sLengthMenu":    "Menampilkan _MENU_ baris",
+            "sZeroRecords":   "Tidak ada data",
+            "sEmptyTable":    "Tidak ada data yang tersedia di tabel ini",
+            "sInfo":          "Menampilkan baris _START_ sampai _END_ dari _TOTAL_ data",
+            "sInfoEmpty":     "Menampilkan baris 0 sampai 0 dari 0 data",
+            "sInfoFiltered":  "(disaring dari _MAX_ data)",
+            "sInfoPostFix":   "",
+            "sSearch":        "Cari:",
+            "sUrl":           "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Memuat...",
+            "oPaginate": {
+                "sFirst":    "Awal",
+                "sLast":    "Akhir",
+                "sNext":    "Berikutnya",
+                "sPrevious": "Sebelumya"
+            },
+            "oAria": {
+                "sSortAscending":  ": Aktifkan untuk mengurutkan kolom dalam urutan menaik",
+                "sSortDescending": ": Aktifkan untuk mengurutkan kolom dalam urutan menurun"
+            }
+        }
     });
-    // alert('ini adalah yang pertama');
 });
 $(document).off('click', '.fee_history').on('click', '.fee_history', function(){
     var branch_id = $(this).data('branch-id');

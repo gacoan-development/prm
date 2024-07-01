@@ -8,11 +8,15 @@ class M_invoice extends Model
         $where_params = [
             'DATE(a.inv_date)' => date('Y-m-d', strtotime($date_invoice))
         ];
-        return $this->db->table('tinvoice a')
+        $result = $this->db->table('tinvoice a')
                         ->join('tbranch b', 'b.branch_id = a.branch_id', 'left')
                         ->join('tbranch_group c', 'c.branch_group_id = b.branch_group_id', 'left')
                         ->where($where_params)
                         ->get()->getResult();
+        foreach($result AS $value){
+            $value->inv_date = date('d/m/Y', strtotime($value->inv_date));
+        }
+        return $result;
     }
 
     public function get_all_resto($search_term){
@@ -42,10 +46,21 @@ class M_invoice extends Model
         $where_params = [
             'a.branch_id' => $branch_id
         ];
-        return $this->db->table('tfee_header a')
-                        ->select('*, IF(NOW() BETWEEN a.fee_date_active AND a.fee_date_exp, "applied", "exp") AS fee_status')
+        // return $this->db->table('tfee_header a')
+        //                 // ->select('*, IF(NOW() BETWEEN a.fee_date_active AND a.fee_date_exp, "applied", "exp") AS fee_status')
+        //                 ->where($where_params)
+        //                 ->where('NOW() BETWEEN a.fee_date_active AND a.fee_date_exp')
+        //                 ->orderBy('a.fee_id', 'DESC')
+        //                 ->get()->getResult();
+        return $this->db->table('tbranch a')
+                        ->select('a.branch_code, a.branch_address, c.branch_group_name, d.parkmanagement_name, b.fee_date_active, b.fee_date_exp')
+                        ->select('IF(NOW() BETWEEN b.fee_date_active AND b.fee_date_exp, "applied", "not_applied") AS fee_status')
+                        ->join('tfee_header b', 'b.branch_id = a.branch_id', 'left')
+                        ->join('tbranch_group c', 'c.branch_group_id = a.branch_group_id', 'left')
+                        ->join('tparkmanagement d', 'd.parkmanagement_id = a.parkmanagement_id', 'left')
                         ->where($where_params)
-                        ->orderBy('a.fee_id', 'DESC')
+                        ->orderBy('b.fee_date_exp', 'DESC')
+                        ->limit(1)
                         ->get()->getResult();
     }
 
@@ -114,6 +129,26 @@ class M_invoice extends Model
                             ->join('tinvoice_detail b', 'b.inv_id = a.inv_id', 'left')
                             ->join('tbranch c', 'c.branch_id = a.branch_id', 'left')
                             ->join('tparkmanagement d', 'd.parkmanagement_id = c.parkmanagement_id', 'left')
+                            ->where($where_params)
+                            ->get()->getResult();
+        foreach($result AS $value){
+            $value->inv_date = date('d/m/Y', strtotime($value->inv_date));
+        }
+        return $result;
+    }
+
+    public function load_detailed_invoice($branch_id, $inv_date){
+        $where_params = [
+            'a.branch_id' => $branch_id,
+            'DATE(a.inv_date)' => date('Y-m-d', strtotime($inv_date))
+        ];
+        $result = $this->db->table('tinvoice a')
+                            ->select('*, a.inv_id AS invoice_id')
+                            ->join('tinvoice_detail b', 'b.inv_id = a.inv_id', 'left')
+                            ->join('tbranch c', 'c.branch_id = a.branch_id', 'left')
+                            ->join('tparkmanagement d', 'd.parkmanagement_id = c.parkmanagement_id', 'left')
+                            ->join('torder e', 'e.order_id = b.order_id', 'left')
+                            ->join('tfee_detail f', 'f.fee_id = b.fee_id AND f.order_id = b.order_id', 'left')
                             ->where($where_params)
                             ->get()->getResult();
         foreach($result AS $value){
@@ -199,17 +234,18 @@ class M_invoice extends Model
                                     ->get()->getResult();
         if(count($result_detail) > 0){
             // update
-            $where_params = [
-                'a.inv_id' => $inv_id
-            ];
             foreach($compInvoiceDetail AS $key => $row_detail){
                 $order_id = $row_detail['order_id'];
+                $where_params = [
+                    'a.inv_id' => $inv_id,
+                    'a.order_id' => $order_id
+                ];
                 $fee_id = $row_detail['fee_id'];
                 $amount_of_bill = $row_detail['amount_of_bill'];
                 $bill_parking_fee = $row_detail['bill_parking_fee'];
                 $amount_of_income = $row_detail['amount_of_income'];
                 $update_data = [
-                    'a.order_id' => $order_id,
+                    // 'a.order_id' => $order_id,
                     'a.fee_id' => $fee_id,
                     'a.amount_of_bill' => $amount_of_bill,
                     'a.bill_parking_fee' => $bill_parking_fee,
@@ -254,6 +290,7 @@ class M_invoice extends Model
                             ->join('tbranch c', 'c.branch_id = a.branch_id', 'left')
                             ->join('tparkmanagement d', 'd.parkmanagement_id = c.parkmanagement_id', 'left')
                             ->whereIn('a.inv_id', $checkedId)
+                            ->groupBy('a.inv_id')
                             ->orderBy('a.inv_date', 'ASC')
                             ->get()->getResult();
         foreach($result AS $value){

@@ -15,14 +15,17 @@
                             <table class="table-condensed table-hover" width="80%">
                                 <tbody>
                                     <tr>
+                                        <td>Nama Resto</td>
+                                        <td>:</td>
+                                        <td>
+                                            <select class="form-control form-control-sm selectpicker" name="nama_resto">
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>Kode Resto</td>
                                         <td>:</td>
                                         <td><div id="kode_resto"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Nama Resto</td>
-                                        <td>:</td>
-                                        <td><div id="nama_resto"></div></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -31,14 +34,19 @@
                             <table class="table-condensed table-hover" width="80%">
                                 <tbody>
                                     <tr>
-                                        <td>Alamat</td>
+                                        <td>Alamat Resto</td>
                                         <td>:</td>
                                         <td><div id="alamat_resto"></div></td>
                                     </tr>
                                     <tr>
-                                        <td>Region</td>
+                                        <td>Area</td>
                                         <td>:</td>
                                         <td><div id="region_resto"></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pengelola</td>
+                                        <td>:</td>
+                                        <td><div id="pengelola_resto"></div></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -47,7 +55,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-12">
+        <div class="col-lg-12 d-none" id="div_form_tarif_parkir">
             <div class="card border-dark mt-2">
                 <div class="card-header p-1 border-dark bg-primary text-white text-center">
                     <h6>FORM TARIF PARKIR</h6>
@@ -78,7 +86,14 @@
                                     <tr>
                                         <td>Lampiran</td>
                                         <td>:</td>
-                                        <td><input type="text" name="lampiran_tarif_parkir" id="" class="form-control form-control-sm serialize" data-title="Lampiran Tarif"></td>
+                                        <td>
+                                            <div id="attachment_exist" class="d-none">
+                                                <button type="button" class="btn btn-sm btn-info" id="id_attachment" data-file="">Lihat lampiran</button>
+                                                <button type="button" class="btn btn-sm btn-danger px-1 py-0" id="delete_file"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                            <input type="file" class="form-control" name="tarif_attachment" data-title="Lampiran Tarif Parkir" id="">
+                                            <!-- <input type="text" name="lampiran_tarif_parkir" id="" class="form-control form-control-sm serialize" data-title="Lampiran Tarif"> -->
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -163,6 +178,71 @@ $(document).ready(function () {
         changeMonth: true, 
         changeYear: true
     });
+    $(document).find('select[name="nama_resto"]').select2({
+        tokenSeparators: [',', ' '],
+        minimumInputLength: 1,
+        minimumResultsForSearch: 10,
+        width: '100%',
+        ajax: {
+            url: '<?= base_url('invoice/get_all_resto'); ?>',
+            dataType: "json",
+            type: "GET",
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.value,
+                            id: item.id
+                        }
+                    })
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Masukkan nama resto'
+    });
+    $(document).off('change', '[name="nama_resto"]').on('change', '[name="nama_resto"]', function(){
+        var selected_value = $(this).find('option:selected').val();
+        // cek dulu apakah resto ini punya tarif yang sedang berlaku
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "<?= base_url('tarif_parkir/check_fee_active') ?>",
+            data: {
+                branch_id: selected_value
+            },
+            dataType: "JSON",
+            success: function (response) {
+                // console.log(response);
+                if(response.length > 0){
+                    var active_status = response[0].active_status; 
+                    var fee_id = '<?= $this->data['fee_id']; ?>';
+                    if(active_status == 'expired' && fee_id === ''){ // ini antara expired atau emang belum ada tarif
+                        $(document).find('div#kode_resto').html(response[0].branch_code);
+                        $(document).find('div#alamat_resto').html(response[0].branch_address);
+                        $(document).find('div#region_resto').html(response[0].branch_group_name);
+                        $(document).find('div#pengelola_resto').html(response[0].parkmanagement_name);
+                        $(document).find('#div_form_tarif_parkir').removeClass('d-none');
+                        $(document).find('[name="nama_resto"]').attr('disabled', true);
+                    }else if(active_status == 'active' && fee_id === ''){
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Perhatian!",
+                            text: "Tarif parkir untuk resto ini sudah ada yang aktif. Silahkan edit di menu edit.",
+                            allowOutsideClick: false,
+                            showConfirmButton: true
+                        })
+                    }
+                }
+            }
+        });
+    });
     $(document).off('change', 'select[name="tipe_komisi"]').on('change', 'select[name="tipe_komisi"]', function(){
         // alert($(this).val());
         var this_value = $(this).val();
@@ -237,9 +317,10 @@ $(document).ready(function () {
                 // console.log(response);
                 if(response.length > 0){
                     $(document).find('#kode_resto').html(response[0].branch_code);
-                    $(document).find('#nama_resto').html(response[0].branch_name);
+                    $(document).find('[name="nama_resto"]').append('<option value="'+response[0].branch_id+'">'+response[0].branch_name+'</option>').trigger('change');
                     $(document).find('#alamat_resto').html(response[0].branch_address);
                     $(document).find('#region_resto').html(response[0].branch_group_name);
+                    $(document).find('#pengelola_resto').html(response[0].parkmanagement_name);
                 }
             }
         });
@@ -258,6 +339,8 @@ $(document).ready(function () {
             success: function (response) {
                 // console.log(response);
                 if(response.length > 0){
+                    $(document).find('#div_form_tarif_parkir').removeClass('d-none');
+                    $(document).find('[name="nama_resto"]').attr('disabled', 'disabled');
                     $(document).find('[name="kode_tarif_parkir"]').val(response[0].fee_code);
                     $(document).find('[name="nama_tarif_parkir"]').val(response[0].fee_name);
                     $(document).find('[name="tipe_komisi"]').val(response[0].revenue_id).trigger('change');
@@ -265,6 +348,11 @@ $(document).ready(function () {
                     $(document).find('[name="tanggal_kadaluwarsa_tarif_parkir"]').val(date_convert(response[0].fee_date_exp));
                     $(document).find('[name="keaktifan_tarif_parkir"][value="'+response[0].is_active+'"]').trigger('click');
                     $(document).find('[name="keterangan_tarif_parkir"]').val(response[0].fee_note);
+                    if(response[0].attachment != '' && response[0].attachment != null){
+                        $(document).find('#attachment_exist').removeClass('d-none');
+                        $(document).find('#id_attachment').data('file', response[0].attachment);
+                        $(document).find('[name="tarif_attachment"]').addClass('d-none');
+                    }
                     if(response[0].detail_status == 'detailed'){
                         for(var keys in response){
                             $('table#tabel_detail_tarif').prev('button.add-dynamic-table').trigger('click');
@@ -407,12 +495,16 @@ $('button#simpan_form_tarif_parkir').off('click').on('click', function(){
             title: "Perhatian!",
             html: html,
             allowOutsideClick: false,
-        })
+        });
     }else if(passed){
         var fee_code = $('[name="kode_tarif_parkir"]').val();
         var fee_id = '<?= $this->data['fee_id']; ?>';
         var user_nik = '<?= $session->get('user_nik') ?>';
         var branch_id = '<?= $this->data['branch_id']; ?>';
+        if(branch_id === ''){
+            branch_id = $(document).find('[name="nama_resto"]').val();
+        }
+        // console.log(branch_id);
         var data = $('.serialize').filter(function(index, element) {
                         return $(element).val() != '';
                     }).serializeArray();
@@ -459,7 +551,12 @@ $('button#simpan_form_tarif_parkir').off('click').on('click', function(){
             dataType: "JSON",
             success: function (query_response) {
                 console.log(query_response);
-                if(query_response == '1'){
+                if(query_response != '0'){
+                    if(fee_id === ''){
+                        upload_tarif_attachment(query_response);
+                    }else{
+                        upload_tarif_attachment(fee_id);
+                    }
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
@@ -476,7 +573,51 @@ $('button#simpan_form_tarif_parkir').off('click').on('click', function(){
             }
         });
     }
-})
+});
+
+function upload_tarif_attachment(fee_id){
+    var file_attachment = $(document).find('[name="tarif_attachment"]')[0].files[0];
+    const formData = new FormData();
+    formData.append('tarif_file', file_attachment);
+
+    var uploadStatus = false;
+    var uploaded_filename = '';
+    $.ajax({
+        async: false,
+        type: "POST",
+        url: "<?= base_url('tarif_parkir/upload_tarif'); ?>",
+        data: formData,
+        processData: false, 
+        contentType: false,
+        dataType: "JSON",
+        success: function (response) {
+            // console.log(response);
+            if(response != 'Failed to upload'){
+                if (response.success) {
+                    uploadStatus = true; // Update the variable on success
+                    uploaded_filename = response.message; // Update the variable on success
+                    console.log('File uploaded successfully');
+                    $.ajax({
+                        async: false,
+                        type: "POST",
+                        url: "<?= base_url('tarif_parkir/update_uploaded_tarif'); ?>",
+                        data: {
+                            filename: uploaded_filename,
+                            fee_id_upload: fee_id,
+                        },
+                        dataType: "JSON",
+                        success: function (response) {
+                            console.log('filename updated to the table');
+                        }
+                    });
+                } else {
+                    uploadStatus = false; // Update the variable on failure
+                    console.error('Failed to upload file');
+                }
+            }
+        }
+    });
+}
 
 $('#batal_form_tarif_parkir').click(function(){
     Swal.fire({
@@ -554,5 +695,44 @@ function load_master_revenue_type(){
         }
     });
 }
+
+$(document).off('click', '#id_attachment').on('click', '#id_attachment', function(){
+    var origin = 'tarif';
+    var attachment = $(this).data('file');
+    imageUrl = '<?= base_url('file/viewFile/'); ?>'+origin+'/'+attachment;
+    window.open(imageUrl, '_blank');
+});
+
+$(document).off('click', '#delete_file').on('click', '#delete_file', function(){
+    Swal.fire({
+        icon: "question",
+        title: "Yakin?",
+        text: "Anda yakin untuk menghapus file lampiran?",
+        allowOutsideClick: false,
+        showDenyButton: true,
+        confirmButtonText: "Ya",
+        denyButtonText: "Tidak"
+    })
+    .then((feedback)=>{
+        if(feedback.isConfirmed){
+            $(document).find('#attachment_exist').remove();
+            $(document).find('[name="tarif_attachment"]').removeClass('d-none');
+            var fee_id = '<?= $this->data['fee_id']; ?>';
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "<?= base_url('tarif_parkir/update_uploaded_tarif'); ?>",
+                data: {
+                    filename: '',
+                    fee_id_upload: fee_id,
+                },
+                dataType: "JSON",
+                success: function (response) {
+                    console.log('filename updated to the table');
+                }
+            });
+        }
+    })
+});
 </script>
 <?= $this->include('layouts/footer') ?>
