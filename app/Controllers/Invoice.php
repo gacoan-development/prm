@@ -92,30 +92,35 @@ class Invoice extends BaseController
     public function print_flat(){
         $branch_id = $this->request->getPost('branch_id');
         $inv_date = $this->request->getPost('inv_date');
-        $checked_id = $this->request->getPost('checked_outstanding_invoice');
+        // $checked_id = $this->request->getPost('checked_outstanding_invoice');
         $data = [];
         $minvoice = new M_invoice();
         $data['existing_invoice'] = $minvoice->load_existing_invoice($branch_id, $inv_date);
-        if($checked_id != ''){
-            $data['selected_outstanding'] = $minvoice->selected_outstanding($checked_id);
-        }else{
-            $data['selected_outstanding'] = [];
-        }
+        $data['branch_id'] = $branch_id;
+        $data['inv_date'] = $inv_date;
+
+        // if($checked_id != ''){
+        //     $data['selected_outstanding'] = $minvoice->selected_outstanding($checked_id);
+        // }else{
+        //     $data['selected_outstanding'] = [];
+        // }
         return view('invoice/print/flat', $data);
     }
 
     public function print_persen(){
         $branch_id = $this->request->getPost('branch_id');
         $inv_date = $this->request->getPost('inv_date');
-        $checked_id = $this->request->getPost('checked_outstanding_invoice');
+        // $checked_id = $this->request->getPost('checked_outstanding_invoice');
         $data = [];
         $minvoice = new M_invoice();
         $data['existing_invoice'] = $minvoice->load_detailed_invoice($branch_id, $inv_date);
-        if($checked_id != ''){
-            $data['selected_outstanding'] = $minvoice->selected_outstanding($checked_id);
-        }else{
-            $data['selected_outstanding'] = [];
-        }
+        $data['branch_id'] = $branch_id;
+        $data['inv_date'] = $inv_date;
+        // if($checked_id != ''){
+        //     $data['selected_outstanding'] = $minvoice->selected_outstanding($checked_id);
+        // }else{
+        //     $data['selected_outstanding'] = [];
+        // }
         return view('invoice/print/persen', $data);
     }
 
@@ -177,6 +182,21 @@ class Invoice extends BaseController
         $inv_id_upload = $this->request->getPost('inv_id_upload');
         $minvoice = new M_invoice();
         $result = $minvoice->update_selected_outstanding_invoice($outstanding_compilation, $inv_id_upload);
+        return json_encode($result);
+    }
+
+    public function get_all_outstanding(){
+        $branch_id = $this->request->getPost('branch_id');
+        $inv_date = $this->request->getPost('inv_date');
+        $minvoice = new M_invoice();
+        $result = $minvoice->get_all_outstanding($branch_id, $inv_date);
+        return json_encode($result);
+    }
+
+    public function get_data_by_id(){
+        $inv_id = $this->request->getPost('inv_id');
+        $minvoice = new M_invoice();
+        $result = $minvoice->get_data_by_id($inv_id);
         return json_encode($result);
     }
     

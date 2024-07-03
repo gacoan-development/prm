@@ -4,33 +4,50 @@ use CodeIgniter\Model;
 
 class M_parkir extends Model
 {
-    public function get_all(){
-        $where_params = array(
-            // 'a.is_active' => '1'
-        );
-        return $this->db->table('tbranch a')
-                        ->select('a.branch_id, a.branch_code, a.branch_name, c.branch_group_name, DATE_FORMAT(d.fee_date_active, "%d/%m/%Y") AS fee_date_active, DATE_FORMAT(d.fee_date_exp, "%d/%m/%Y") AS fee_date_exp, e.revenue_sharing_type, b.parkmanagement_name, d.fee_id')
-                        ->select('CASE 
-                                        WHEN DATEDIFF(d.fee_date_exp, NOW()) > 7 THEN "1_active"
-                                        WHEN d.fee_date_active IS NULL OR d.fee_date_exp IS NULL THEN "2_notdeclared"
-                                        WHEN DATEDIFF(d.fee_date_exp, NOW()) <= 7 AND DATEDIFF(d.fee_date_exp, NOW()) > 0 THEN "3_warning"
-                                        WHEN NOW() > d.fee_date_exp THEN "4_expired"
-                                        ELSE "5_notdetected"
-                                    END AS active_status')
-                        ->join('tparkmanagement b', 'a.parkmanagement_id = b.parkmanagement_id')
-                        ->join('tbranch_group c', 'c.branch_group_id = a.branch_group_id', 'left')
-                        ->join('(SELECT
-                                    *
-                                    from
-                                        (SELECT
-                                        *,
-                                        RANK() OVER(PARTITION BY a.branch_id ORDER BY a.fee_date_exp DESC) AS latest_fee_rank
-                                        FROM tfee_header a) b
-                                    WHERE latest_fee_rank = 1) d', 'd.branch_id = a.branch_id', 'left')
-                        ->join('tmaster_revenue e', 'e.id = d.revenue_id', 'left')
-                        ->where($where_params)
-                        ->orderBy('active_status', 'DESC')
-                        ->get()->getResult();
+    public function get_all($filter){
+        if($filter != null){
+            $where_params = [];
+            if(in_array('applied', $filter)){
+                array_push($where_params, 'DATEDIFF(d.fee_date_exp, NOW()) > 7');
+            }
+            if(in_array('almost_expired', $filter)){
+                array_push($where_params, '(DATEDIFF(d.fee_date_exp, NOW()) <= 7 AND DATEDIFF(d.fee_date_exp, NOW()) > 0)');
+            }
+            if(in_array('expired', $filter)){
+                array_push($where_params, 'NOW() > d.fee_date_exp');
+            }
+            if(in_array('not_declared', $filter)){
+                array_push($where_params, '(d.fee_date_active IS NULL OR d.fee_date_exp IS NULL)');
+            }
+            $where_params = implode(" OR ", $where_params);
+            return $this->db->table('tbranch a')
+                            ->select('a.branch_id, a.branch_code, a.branch_name, c.branch_group_name, DATE_FORMAT(d.fee_date_active, "%d/%m/%Y") AS fee_date_active, DATE_FORMAT(d.fee_date_exp, "%d/%m/%Y") AS fee_date_exp, e.revenue_sharing_type, b.parkmanagement_name, d.fee_id')
+                            ->select('CASE 
+                                            WHEN DATEDIFF(d.fee_date_exp, NOW()) > 7 THEN "1_active"
+                                            WHEN d.fee_date_active IS NULL OR d.fee_date_exp IS NULL THEN "2_notdeclared"
+                                            WHEN DATEDIFF(d.fee_date_exp, NOW()) <= 7 AND DATEDIFF(d.fee_date_exp, NOW()) > 0 THEN "3_warning"
+                                            WHEN NOW() > d.fee_date_exp THEN "4_expired"
+                                            ELSE "5_notdetected"
+                                        END AS active_status')
+                            ->join('tparkmanagement b', 'a.parkmanagement_id = b.parkmanagement_id')
+                            ->join('tbranch_group c', 'c.branch_group_id = a.branch_group_id', 'left')
+                            ->join('(SELECT
+                                        *
+                                        from
+                                            (SELECT
+                                            *,
+                                            RANK() OVER(PARTITION BY a.branch_id ORDER BY a.fee_date_exp DESC) AS latest_fee_rank
+                                            FROM tfee_header a) b
+                                        WHERE latest_fee_rank = 1
+                                        AND b.is_active != 0) d', 'd.branch_id = a.branch_id', 'left')
+                            ->join('tmaster_revenue e', 'e.id = d.revenue_id', 'left')
+                            ->where($where_params)
+                            ->orderBy('active_status', 'DESC')
+                            ->get()->getResult();
+        }else{
+            $result = new \stdClass();
+            return $result;
+        }
     }
 
     public function get_data_by_id($branch_id){
@@ -174,7 +191,7 @@ class M_parkir extends Model
     }
 
     public function update_form_tarif_parkir($fee_id, $data, $user_nik, $branch_id){
-        $fee_name = $fee_date_active = $fee_date_exp = $is_active = $fee_note = $revenue_id = $flat_nbill_nominal = $detail_tarif_parkir = $modified_by = $modified_date = '';
+        $fee_name = $fee_date_active = $fee_date_exp = $is_active = $fee_note = $revenue_id = $flat_nbill_nominal = $detail_tarif_parkir = $modified_by = $modified_date = $is_active = '';
         foreach($data AS $key => $value){
             switch($value['name']){
                 case "nama_tarif_parkir":
@@ -198,9 +215,12 @@ class M_parkir extends Model
                 case "detail_tarif_parkir":
                     $detail_tarif_parkir = $value['value'];
                 break;
+                case "keaktifan_tarif_parkir":
+                    $is_active = $value['value'];
+                break;
             }
         }
-        $is_active = '1';
+        // $is_active = '1';
         $modified_by = $user_nik;
         $modified_date = date('Y-m-d H:i:s');
         $update_data = [
@@ -247,6 +267,7 @@ class M_parkir extends Model
     public function check_fee_active($branch_id){
         $where_params = [
             'a.branch_id' => $branch_id,
+            'd.is_active' => '1'
         ];
         return $this->db->table('tbranch a')
                         ->select('a.branch_id, a.branch_code, a.branch_address, b.branch_group_name, c.parkmanagement_name, d.fee_id, d.fee_date_active, d.fee_date_exp')

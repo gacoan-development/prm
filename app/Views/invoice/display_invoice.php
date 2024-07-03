@@ -79,10 +79,20 @@ function load_invoice_table(){
                 data: "branch_group_name"
             },
             {
-                data: "billed_nominal"
+                data: {
+                    billed_nominal: "billed_nominal"
+                },
+                render: function(data){
+                    return rupiah(data.billed_nominal);
+                }
             },
             {
-                data: "pay_off_nominal"
+                data: {
+                    pay_off_nominal: "pay_off_nominal"
+                },
+                render: function(data){
+                    return rupiah(data.pay_off_nominal);
+                }
             },
             {
                 data: {

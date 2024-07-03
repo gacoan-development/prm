@@ -25,6 +25,7 @@ class Login extends BaseController
                 session()->set('user_nik', $check['user_nik']);
                 session()->set('user_nama', $check['user_name']);
                 session()->set('user_group', $check['group_name']);
+                session()->set('user_group_code', $check['group_user_id']);
                 return redirect()->to(base_url('dashboard'));
             } else {
                 session()->setFlashdata('message', 'Username / Password salah. Silahkan periksa dan coba kembali.');

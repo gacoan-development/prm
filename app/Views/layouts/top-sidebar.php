@@ -1,7 +1,4 @@
 <?php
-  // include __DIR__ . '../../controller/userController.php';
-?>
-<?php
   // require_once 'change_password.php';
   $session = \Config\Services::session();
 ?>
@@ -141,6 +138,24 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
+function rupiah(amount) {
+  return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+  }).format(amount);
+}
+function parseRupiah(rupiahString) {
+  // Remove the currency symbol and any non-digit characters except for the decimal point
+  let numericString = rupiahString.replace(/[^0-9,-]+/g, '');
+  
+  // Replace comma (,) with an empty string and period (.) with a decimal point
+  numericString = numericString.replace(/,/g, '').replace(/-/g, '');
+  
+  // Parse the cleaned string to a float number
+  return parseFloat(numericString);
+}
   // $(document).ready(function() {
   //   $('#showCurrentPasswordBtn').click(function() {
   //     var currentPasswordInput = $('#currentPassword');

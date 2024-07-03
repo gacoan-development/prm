@@ -9,8 +9,9 @@ class Parkir extends BaseController
     }
 
     public function get_all(){
+        $filter = $this->request->getPost('filter');
         $mparkir = new M_parkir();
-        $result = $mparkir->get_all();
+        $result = $mparkir->get_all($filter);
         return json_encode($result);
     }
 

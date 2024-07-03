@@ -390,22 +390,22 @@ $(document).ready(function () {
 
     // autofill data resto
     var inv_id = '<?= $this->data['inv_id']; ?>';
-    if(branch_id != ''){ 
+    if(inv_id != ''){ 
         $.ajax({
             async: false,
             type: "POST",
             url: "<?= base_url('invoice/get_data_by_id'); ?>",
             data: {
-                branch_id: branch_id
+                inv_id: inv_id
             },
             dataType: "JSON",
             success: function (response) {
                 // console.log(response);
                 if(response.length > 0){
-                    $(document).find('#kode_resto').html(response[0].branch_code);
-                    $(document).find('#nama_resto').html(response[0].branch_name);
-                    $(document).find('#alamat_resto').html(response[0].branch_address);
-                    $(document).find('#region_resto').html(response[0].branch_group_name);
+                    $(document).find('[name="nama_resto"]').append('<option value="'+response[0].branch_id+'">'+response[0].branch_name+'</option>').trigger('change');
+                    $(document).find('[name="tgl_invoice"]').val(response[0].inv_date);
+                    $(document).find('#create_invoice').trigger('click');
+                    $(document).find('.swal2-deny').trigger('click');
                 }
             }
         });
@@ -890,11 +890,12 @@ $(document).off('click', '#cetak_form_invoice').on('click', '#cetak_form_invoice
         type: 'hidden',
         name: 'inv_date',
         value: inv_date
-    })).append($('<input>', {
-        type: 'hidden',
-        name: 'checked_outstanding_invoice',
-        value: checked_outstanding_invoice
-    }));
+    }))
+    // .append($('<input>', {
+    //     type: 'hidden',
+    //     name: 'checked_outstanding_invoice',
+    //     value: checked_outstanding_invoice
+    // }));
     form.appendTo('body').submit().remove();
 });
 
@@ -1332,9 +1333,13 @@ function load_invoice(branch_id, inv_date){
                                 if(response[keys].order_type_fee == 'F'){
                                     var order_type_fee = 'FLAT';
                                     var nominal = rupiah(response[keys].fee_nominal);
+                                    var prepend = '';
+                                    var append = '<span class="input-group-text">Bill</span>';
                                 }else if(response[keys].order_type_fee == 'P'){
                                     var order_type_fee = 'PERCENTAGE';
                                     var nominal = response[keys].fee_nominal+' %';
+                                    var prepend = '<span class="input-group-text">Rp</span>';
+                                    var append = '';
                                 }
                                 html += '<tr>'+
                                             '<td>'+(parseInt(keys)+1)+'</td>'+
@@ -1343,8 +1348,11 @@ function load_invoice(branch_id, inv_date){
                                             '<td class="text-center">'+order_type_fee+'</td>'+
                                             '<td class="text-center fee_nominal" data-nominal="'+response[keys].fee_nominal+'">'+nominal+'</td>'+
                                             '<td>'+
-                                                
-                                                '<input type="text" class="form-control form-control-sm text-center bill_amount" data-calculation-type="'+response[keys].order_type_fee+'">'+
+                                                '<div class="input-group">'+
+                                                    prepend+
+                                                    '<input type="text" class="form-control form-control-sm text-center bill_amount" data-calculation-type="'+response[keys].order_type_fee+'">'+
+                                                    append+
+                                                '</div>'+
                                             '</td>'+
                                             '<td><input class="form-control form-control-sm text-center total_per_order" data-order-id="'+response[keys].order_id+'" data-fee-id="'+response[keys].fee_id+'" readOnly value="0"></td>'+
                                         '</tr>';
@@ -1422,24 +1430,6 @@ function load_outstanding_invoice(branch_id, tgl_invoice){
             $(document).find('#tabel_invoice_outstanding tbody').empty().append(html);
         }
     });
-}
-function rupiah(amount) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    }).format(amount);
-}
-function parseRupiah(rupiahString) {
-    // Remove the currency symbol and any non-digit characters except for the decimal point
-    let numericString = rupiahString.replace(/[^0-9,-]+/g, '');
-    
-    // Replace comma (,) with an empty string and period (.) with a decimal point
-    numericString = numericString.replace(/,/g, '').replace(/-/g, '');
-    
-    // Parse the cleaned string to a float number
-    return parseFloat(numericString);
 }
 </script>
 <?= $this->include('layouts/footer') ?>

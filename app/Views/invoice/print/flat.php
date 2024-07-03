@@ -122,60 +122,31 @@
                                         </tfoot>
                                     </table>
                                 </div>
-                                <?php
-                                    if(count($this->data['selected_outstanding']) > 0){
-                                        $sum_bill_outstanding = $sum_pay_off_outstanding = $sum_diff_outstanding = 0;
-                                        ?>
-                                            <div class="row mt-3" id="div_outstanding_invoice" style="font-size: 12px;">
-                                                <div class="col-lg-12">
-                                                    <h6><b>Rincian Tunggakan Sebelumnya:</b></h6>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <table class="table-condensed table-bordered table-dark" width="100%" id="tabel_outstanding_invoice">
-                                                        <thead class="bg-dark text-center">
-                                                            <tr>
-                                                                <th width="25%">Nomor Surat</th>
-                                                                <th>Tanggal Tagihan</th>
-                                                                <th>Total Tagihan</th>
-                                                                <th>Jumlah Terbayar</th>
-                                                                <th class="text-danger">Jumlah Terutang</th>
-                                                                <th width="15%">Jumlah yang Disetor Saat Ini</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="text-center">
-                                                            <?php
-                                                                foreach($this->data['selected_outstanding'] AS $out_inv){
-                                                                    $sum_bill_outstanding += intval($out_inv->billed_nominal);
-                                                                    $sum_pay_off_outstanding += intval($out_inv->pay_off_nominal);
-                                                                    $sum_diff_outstanding += intval($out_inv->billed_nominal) - intval($out_inv->pay_off_nominal);
-                                                                    ?>
-                                                                    <tr>
-                                                                        <td><?= $out_inv->inv_code; ?></td>
-                                                                        <td><?= $out_inv->inv_date; ?></td>
-                                                                        <td><?= rupiah($out_inv->billed_nominal); ?></td>
-                                                                        <td><?= rupiah($out_inv->pay_off_nominal); ?></td>
-                                                                        <td><?= rupiah(intval($out_inv->billed_nominal) - intval($out_inv->pay_off_nominal)); ?></td>
-                                                                        <td class="bg-warning"></td>
-                                                                    </tr>
-                                                                    <?php
-                                                                }
-                                                            ?>
-                                                        </tbody>
-                                                        <tfoot class="bg-primary text-center">
-                                                            <tr>
-                                                                <td colspan="2" class="text-center"><b>Total</b></td>
-                                                                <td><?= rupiah($sum_bill_outstanding); ?></td>
-                                                                <td><?= rupiah($sum_pay_off_outstanding); ?></td>
-                                                                <td class="text-danger"><?= rupiah($sum_diff_outstanding); ?></td>
-                                                                <td class="bg-warning"></td>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        <?php
-                                    }
-                                ?>
+                            </div>
+                            <div class="row mt-3" id="div_outstanding_invoice" style="font-size: 12px;">
+                                <div class="col-lg-12">
+                                    <h6><b>Rincian Tunggakan Sebelumnya:</b></h6>
+                                </div>
+                                <div class="col-lg-12">
+                                    <table class="table-condensed table-bordered table-dark" width="100%" id="tabel_outstanding_invoice">
+                                        <thead class="bg-dark text-center">
+                                            <tr>
+                                                <th width="25%">Nomor Surat</th>
+                                                <th>Tanggal Tagihan</th>
+                                                <th>Total Tagihan</th>
+                                                <th>Jumlah Terbayar</th>
+                                                <th class="text-danger">Jumlah Terutang</th>
+                                                <th width="15%">Jumlah yang Disetor Saat Ini</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-center">
+                                            
+                                        </tbody>
+                                        <tfoot class="bg-primary text-center">
+                                            
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-lg-6 col-md-6 col-sm-6 text-start">
@@ -200,15 +171,49 @@
             </tbody>
         </table>
     </div>
-    
     <!-- <h1>Content to Print</h1>
     <p>This content is generated by a PHP script and will be printed.</p> -->
 </body>
 <script>
     $(document).ready(function () {
-        
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "<?= base_url('invoice/get_all_outstanding') ?>",
+            data: {
+                branch_id: "<?= $this->data['branch_id'] ?>",
+                inv_date: "<?= $this->data['inv_date'] ?>"
+            },
+            dataType: "JSON",
+            success: function (response) {
+                // console.log(response)
+                if(response.length > 0){
+                    var html = '';
+                    for(var keys in response){
+                        html += '<tr>'+
+                                    '<td>'+response[keys].inv_code+'</td>'+
+                                    '<td>'+response[keys].inv_date+'</td>'+
+                                    '<td>'+rupiah(response[keys].billed_nominal)+'</td>'+
+                                    '<td>'+rupiah(response[keys].pay_off_nominal)+'</td>'+
+                                    '<td>'+rupiah(parseInt(response[keys].billed_nominal)-parseInt(response[keys].pay_off_nominal))+'</td>'+
+                                    '<td></td>'+
+                                '</tr>';
+                    }
+                    $('#tabel_outstanding_invoice tbody').append(html);
+                }else{
+                    $('#div_outstanding_invoice').addClass('d-none');
+                }
+            }
+        });
         window.print();
-        // $(document).find('#inv_date').html('');
     });
+    function rupiah(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
 </script>
 </html>

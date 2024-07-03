@@ -34,7 +34,7 @@ $routes->post('group_resto/update_form_group_resto', 'GroupResto::update_form_gr
 
 // TARIF PARKIR
 $routes->get('tarif_parkir', 'Parkir::tarif_parkir_page');
-$routes->get('tarif_parkir/get_all', 'Parkir::get_all');
+$routes->post('tarif_parkir/get_all', 'Parkir::get_all');
 $routes->get('tarif_parkir/form_parkir', 'Parkir::form_parkir');
 $routes->post('tarif_parkir/get_data_by_id', 'Parkir::get_data_by_id');
 $routes->post('tarif_parkir/get_fee', 'Parkir::get_fee');
@@ -92,6 +92,8 @@ $routes->post('invoice/update_invoice_detail', 'Invoice::update_invoice_detail')
 $routes->post('invoice/upload_invoice', 'Invoice::upload_invoice');
 $routes->post('invoice/update_uploaded_invoice', 'Invoice::update_uploaded_invoice');
 $routes->post('invoice/update_selected_outstanding_invoice', 'Invoice::update_selected_outstanding_invoice');
+$routes->post('invoice/get_all_outstanding', 'Invoice::get_all_outstanding');
+$routes->post('invoice/get_data_by_id', 'Invoice::get_data_by_id');
 
 // PAJAK
 $routes->get('pajak', 'Pajak::pajak_page');

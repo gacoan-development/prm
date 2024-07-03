@@ -387,6 +387,43 @@ class M_invoice extends Model
         }
         return $affected_installment_payment;
     }
+    public function get_all_outstanding($branch_id, $inv_date){
+        $inv_date = date('Y-m-d', strtotime($inv_date));
+        $where_params = [
+            'a.branch_id' => $branch_id,
+            'a.inv_date !=' => $inv_date,
+            'a.inv_status' => 0 // nyari yang inv_status nya 0 artinya masih outstanding
+        ];
+        $result = $this->db->table('tinvoice a')
+                            ->select('a.inv_id, a.inv_date, a.inv_code, a.branch_id, a.billed_nominal, a.pay_off_nominal, a.inv_status, b.latest_order, c.installment_order, c.installment_paid_amount, c.amount_outstanding, c.ref_inv_id')
+                            ->join('(SELECT
+                                        a.inv_id, MAX(a.installment_order) AS latest_order
+                                        FROM tinstallment_payment a
+                                        GROUP BY a.inv_id) b', 'b.inv_id = a.inv_id', 'left')
+                            ->join('tinstallment_payment c', 'c.inv_id = a.inv_id AND c.installment_order = b.latest_order', 'left')
+                            ->where($where_params)
+                            ->orderBy('a.inv_date', 'asc')
+                            ->get()->getResult();
+        foreach($result AS $value){
+            $value->inv_date = date('d/m/Y', strtotime($value->inv_date));
+        }
+        return $result;
+    }
+
+    public function get_data_by_id($inv_id){
+        $where_params = [
+            'a.inv_id' => $inv_id
+        ];
+        $result =  $this->db->table('tinvoice a')
+                            ->select('a.branch_id, b.branch_name, a.inv_date')
+                            ->join('tbranch b', 'b.branch_id = a.branch_id', 'left')
+                            ->where($where_params)
+                            ->get()->getResult();
+        foreach($result AS $value){
+            $value->inv_date = date('d-m-Y', strtotime($value->inv_date));
+        }
+        return $result;
+    }
 }
 
 ?>

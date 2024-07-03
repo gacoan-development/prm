@@ -1,6 +1,10 @@
+<?php
+  // require_once 'change_password.php';
+  $session = \Config\Services::session();
+?>
 <div class="sidebar-wrapper">
     <div>
-        <!-- <div class="logo-wrapper"><a href="<?= base_url('dashboard'); ?>"><img class="img-fluid for-light" src="../assets/images/logo/login.png" alt=""></a> -->
+        <!-- <div class="logo-wrapper"><a href="<?//= base_url('dashboard'); ?>"><img class="img-fluid for-light" src="../assets/images/logo/login.png" alt=""></a> -->
         <div class="logo-wrapper"><a href="<?= base_url('dashboard'); ?>"><img class="img-fluid for-light" src="../assets/prm-header.png" alt=""></a>
         <div class="back-btn"><i class="fa fa-angle-left"></i></div>
         <div class="toggle-sidebar"><i class="fa fa-cog status_toggle middle sidebar-toggle"> </i></div>
@@ -18,34 +22,27 @@
                 </li> -->
                 <li class="menu-box">
                     <ul>
-                        <li class="sidebar-list"> <a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="database"></i><span>Master </span></a>
+                        <li class="sidebar-list d-none" menu-available-for="1 5"> <a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="database"></i><span>Master </span></a>
                             <ul class="sidebar-submenu">
-                                <!-- <li><a href="<?//= base_url('resto'); ?>">Data Resto</a></li> -->
-                                <!-- <li><a href="<?//= base_url('group_resto'); ?>">Group Resto</a></li> -->
-                                <li><a href="<?= base_url('pengelola'); ?>">Pengelola</a></li>
-                                <li><a href="<?= base_url('tarif_parkir'); ?>">Tarif Parkir</a></li>
-                                <!-- <li><a href="<?//= base_url('order_type'); ?>">Tipe Order</a></li> -->
-                                
+                                <li class="d-none" menu-available-for="5"><a href="<?= base_url('resto'); ?>">Data Resto</a></li>
+                                <li class="d-none" menu-available-for="5"><a href="<?= base_url('group_resto'); ?>">Group Resto</a></li>
+                                <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('pengelola'); ?>">Pengelola</a></li>
+                                <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('tarif_parkir'); ?>">Tarif Parkir</a></li>
+                                <li class="d-none" menu-available-for="5"><a href="<?= base_url('order_type'); ?>">Tipe Order</a></li>
                             </ul>
                         </li>
-                        <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="dollar-sign"></i><span>Transaksi</span></a>
+                        <li class="sidebar-list d-none" menu-available-for="1 2 3 4 5"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="dollar-sign"></i><span>Transaksi</span></a>
                             <ul class="sidebar-submenu">
-                                <li><a href="<?= base_url('invoice'); ?>">Penagihan</a></li>        
-                                <!-- <li><a href="<?// = base_url('invoice/form_invoice'); ?>">Form Penagihan</a></li> -->
-                                <!-- <li><a href="<?= base_url('invoice/resto_dashboard_invoice'); ?>">Kalender Penagihan Resto (Prototype)</a></li> -->
-                                <li><a href="<?= base_url('pajak'); ?>">Monitoring Pembayaran Pajak</a></li>
+                                <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('invoice'); ?>">Penagihan</a></li>        
+                                <li class="d-none" menu-available-for="2 3 4"><a href="<?= base_url('invoice/form_invoice'); ?>">Form Penagihan</a></li>
+                                <!-- <li><a href="<?//= base_url('invoice/resto_dashboard_invoice'); ?>">Kalender Penagihan Resto (Prototype)</a></li> -->
+                                <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('pajak'); ?>">Monitoring Pembayaran Pajak</a></li>
                             </ul>
                         </li>
-                        <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="file-text"></i><span>Laporan</span></a>
+                        <li class="sidebar-list d-none" menu-available-for="1 5"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="file-text"></i><span>Laporan</span></a>
                             <ul class="sidebar-submenu">
                                 <!-- <li><a href="<?//= base_url('invoice'); ?>">Penagihan</a></li> -->
-                                <li><a href="<?= base_url('report/receive_fee'); ?>"><i>Receive Fee</i></a></li>
-                                <!-- <li><a href="layout-rtl.html">RTL</a></li>
-                                <li><a href="layout-dark.html">Dark Layout</a></li>
-                                <li><a href="hide-on-scroll.html">Hide Nav Scroll</a></li>
-                                <li><a href="footer-light.html">Footer Light</a></li>
-                                <li><a href="footer-dark.html">Footer Dark</a></li>
-                                <li><a href="footer-fixed.html">Footer Fixed</a></li> -->
+                                <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('report/receive_fee'); ?>"><i>Receive Fee</i></a></li>
                             </ul>
                         </li>
                     </ul>
@@ -134,3 +131,18 @@
         </nav>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        var user_group_code = '<?= $session->get('user_group_code'); ?>';
+        $(document).find('.sidebar-list').each(function(index, element){
+            if( $(element).is('[menu-available-for~="'+user_group_code+'"]') ) {
+                $(element).removeClass('d-none');
+            }
+        });
+        $(document).find('.sidebar-submenu > li').each(function(index, element){
+            if( $(element).is('[menu-available-for~="'+user_group_code+'"]') ) {
+                $(element).removeClass('d-none');
+            }
+        });
+    });
+</script>

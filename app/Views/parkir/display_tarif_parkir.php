@@ -5,10 +5,31 @@
             <h4 class="text-center">DATA TARIF PARKIR</h4>
         </div>
         <div class="col-lg-12" style="overflow: auto;">
-            <div class="text-end">
-                <button type="button" class="btn btn-sm px-3" style="background-color: #d4edda"></button>: Tarif berlaku &emsp;
-                <button type="button" class="btn btn-sm px-3" style="background-color: #fff3cd"></button>: Tarif < seminggu akan kadaluwarsa &emsp;
-                <button type="button" class="btn btn-sm px-3" style="background-color: #f8d7da"></button>: Tarif kadaluwarsa <br/>
+            <div class="">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="fee_filter" value="applied" id="filter_applied" checked>
+                    <label class="form-check-label" for="filter_applied">
+                        <button type="button" class="btn btn-sm px-3" style="background-color: #d4edda"></button>: Tarif berlaku &emsp;
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="fee_filter" value="almost_expired" id="filter_almost_expired" checked>
+                    <label class="form-check-label" for="filter_almost_expired">
+                        <button type="button" class="btn btn-sm px-3" style="background-color: #fff3cd"></button>: Tarif < seminggu akan kadaluwarsa &emsp;
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="fee_filter" value="expired" id="filter_expired" checked>
+                    <label class="form-check-label" for="filter_expired">
+                        <button type="button" class="btn btn-sm px-3" style="background-color: #f8d7da"></button>: Tarif kadaluwarsa <br/>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="fee_filter" value="not_declared" id="filter_not_declared" checked>
+                    <label class="form-check-label" for="filter_not_declared">
+                        <button type="button" class="btn btn-sm px-3" style="background-color: white"></button>: Tarif belum ada <br/>
+                    </label>
+                </div>
             </div>
             <a type="button" class="btn btn-sm btn-primary" id="tambah_tarif_parkir" href="<?= base_url('tarif_parkir/form_parkir'); ?>">+ Tambah data tarif parkir</a>
             <table id="table_master_tarif_parkir" class="table table-bordered table-hover">
@@ -66,11 +87,17 @@
 </div>
 <script>
 $(document).ready(function () {
-    // $(document).find('[data-toggle="tooltip"]').tooltip();
-    $('table#table_master_tarif_parkir').dataTable({
+    var tarif_table = $('table#table_master_tarif_parkir').dataTable({
         ajax: {
+            async: false,
+            type: "POST",
             url: "<?= base_url('tarif_parkir/get_all'); ?>",
-            dataSrc: ''
+            dataSrc: '',
+            data: function(d){
+                d.filter = $('input[name="fee_filter"]').filter(':checked').map(function() {
+                                return $(this).val();
+                            }).get();
+            }
         },
         createdRow: function (row, data, dataIndex) {
             switch(data['active_status']){
@@ -189,6 +216,9 @@ $(document).ready(function () {
             }
         }
     });
+    $(document).off('click', '[name="fee_filter"]').on('click', '[name="fee_filter"]', function(){
+        $('#table_master_tarif_parkir').DataTable().ajax.reload();
+    })
 });
 $(document).off('click', '.fee_history').on('click', '.fee_history', function(){
     var branch_id = $(this).data('branch-id');
@@ -219,5 +249,6 @@ $(document).off('click', '.fee_history').on('click', '.fee_history', function(){
         }
     });
 })
+
 </script>
 <?= $this->include('layouts/footer') ?>

@@ -221,7 +221,7 @@ $(document).ready(function () {
             success: function (response) {
                 // console.log(response);
                 if(response.length > 0){
-                    var active_status = response[0].active_status; 
+                    var active_status = response[0].active_status;
                     var fee_id = '<?= $this->data['fee_id']; ?>';
                     if(active_status == 'expired' && fee_id === ''){ // ini antara expired atau emang belum ada tarif
                         $(document).find('div#kode_resto').html(response[0].branch_code);
