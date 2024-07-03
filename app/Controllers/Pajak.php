@@ -65,6 +65,19 @@ class Pajak extends BaseController
         }
     }
 
+    public function update_form_pajak(){
+        if($this->request->getPost('data') != null){
+            $data = $this->request->getPost('data');
+            $user_nik = $this->request->getPost('user_nik');
+            $taxpay_id = $this->request->getPost('taxpay_id');
+            $mpajak = new M_pajak();
+            $result = $mpajak->update_form_pajak($data, $user_nik, $taxpay_id);
+            return json_encode($result);
+        }else{
+            return 'code_clear';
+        }
+    }
+
     public function upload_pajak(){
         $file = $this->request->getFile('taxpay_file');
         

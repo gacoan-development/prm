@@ -123,7 +123,7 @@
                                     </thead>
                                 </table>
                             </div>
-                            <div id="receive_fee" class="d-none ms-5">
+                            <div id="div_tabel_detail_persen" class="d-none ms-5">
                                 <table class="table table-bordered table-hover" id="tabel_detail_persen">
                                     <thead class="text-center bg-primary">
                                         <tr>

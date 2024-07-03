@@ -100,6 +100,7 @@ $routes->post('pajak/get_data_by_id', 'Pajak::get_data_by_id');
 $routes->get('pajak/form_pajak', 'Pajak::form_pajak');
 $routes->get('pajak/get_all_resto', 'Pajak::get_all_resto');
 $routes->post('pajak/simpan_form_pajak', 'Pajak::save_form_pajak');
+$routes->post('pajak/update_form_pajak', 'Pajak::update_form_pajak');
 $routes->post('pajak/upload_pajak', 'Pajak::upload_pajak');
 $routes->post('pajak/update_attachment', 'Pajak::update_attachment');
 $routes->post('pajak/update_uploaded_pajak', 'Pajak::update_uploaded_pajak');

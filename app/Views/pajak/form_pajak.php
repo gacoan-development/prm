@@ -5,8 +5,8 @@
 <style>
     /* .ui-datepicker-calendar {
         display: none;
-        }
-    .ui-widget {
+    } */
+    /*.ui-widget {
         font-size:.7em;
     } */
 </style>
@@ -33,15 +33,32 @@
                                         <td>Nama Resto</td>
                                         <td>:</td>
                                         <td>
-                                            <select class="form-control form-control-sm serialize selectpicker" name="nama_resto">
+                                            <select class="form-control serialize selectpicker" name="nama_resto">
                                             </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tanggal Pembayaran</td>
+                                        <td>:</td>
+                                        <td>
+                                            <input type="text" name="waktu_pembayaran_pajak" id="waktu_pembayaran_pajak" class="form-control text-center serialize datepicker" value="<?= date('d-m-Y') ?>">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Periode</td>
+                                        <td>:</td>
+                                        <td>
+                                            <input type="text" name="periode_pajak" id="periode_pajak" class="form-control text-center serialize monthpicker">
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Nominal Pembayaran Pajak</td>
                                         <td>:</td>
                                         <td>
-                                            <input type="text" class="form-control serialize" name="bill_total_taxpay" aria-label="Sizing example input" data-title="Nominal Pembayaran Pajak">
+                                            <div class="input-group">
+                                                <span class="input-group-text" id="nominal_pembayaran_pajak">Rp. </span>
+                                                <input type="text" class="form-control text-center serialize" name="bill_total_taxpay" data-title="Nominal Pembayaran Pajak" aria-describedby="nominal_pembayaran_pajak">
+                                            </div>
                                         </td>
                                     </tr>
                                     <!-- <tr>
@@ -85,13 +102,6 @@
                                         </td>
                                     </tr> -->
                                     <tr>
-                                        <td>Periode</td>
-                                        <td>:</td>
-                                        <td>
-                                            <input type="text" name="periode_pajak" id="periode_pajak" class="form-control form-control-sm text-center serialize datepicker" value="<?= date('d-m-Y'); ?>">
-                                        </td>
-                                    </tr>
-                                    <tr>
                                         <td>Catatan</td>
                                         <td>:</td>
                                         <td>
@@ -134,11 +144,29 @@
 <script>
 $(document).ready(function () {
     load_master_area();
+    $('.monthpicker').datepicker( {
+        changeMonth: true,
+        changeYear: true,
+        showButtonPanel: true,
+        dateFormat: 'MM yy',
+        language: "id",
+        onClose: function(dateText, inst) { 
+            var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+            var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+            $(this).datepicker('setDate', new Date(year, month, 1));
+        }
+    });
     $(document).find('.datepicker').datepicker({
         dateFormat: 'dd-mm-yy',
         changeMonth: true, 
         changeYear: true
     });
+    $('.monthpicker').click(function(){
+        $(document).find('.ui-datepicker-calendar').css('display', 'none');
+    })
+    $('.datepicker').click(function(){
+        $(document).find('.ui-datepicker-calendar').css('display', 'relative');
+    })
     $('[name="pengelola_parkir_resto"]').select2({
         tokenSeparators: [',', ' '],
         minimumInputLength: 1,
@@ -218,7 +246,24 @@ $(document).ready(function () {
                     // $(document).find('[name="store_key"]').val(response[0].store_key);
                     // $(document).find('[name="branch_pos"]').val(response[0].branch_pos);
                     // $(document).find('[name="keaktifan"][value="'+response[0].is_active+'"]').trigger('click');
+                    $(document).find('[name="waktu_pembayaran_pajak"]').val(date_convert(response[0].tanggal_pembayaran));
+                    var month_array = [
+                        'January',
+                        'February',
+                        'March',
+                        'April',
+                        'May',
+                        'June',
+                        'July',
+                        'August',
+                        'September',
+                        'October',
+                        'November',
+                        'December'
+                    ];
+                    $(document).find('[name="periode_pajak"]').val(month_array[(parseInt(response[0].bulan_pembayaran)-1)]+' '+response[0].tahun_pembayaran);
                     $(document).find('[name="nama_resto"]').append('<option value="'+response[0].branch_id+'">'+response[0].branch_name+'</option>').trigger('change');
+                    $(document).find('[name=""]')
                     if(response[0].taxpay_attachment != '' && response[0].taxpay_attachment != null){
                         $(document).find('#attachment_exist').removeClass('d-none');
                         $(document).find('#id_attachment').data('file', response[0].taxpay_attachment);
@@ -418,7 +463,7 @@ $('#batal_form_pajak').click(function(){
     })
     .then((choice)=>{
         if(choice.isConfirmed){
-            window.location = '<?= base_url('resto'); ?>';
+            window.location = '<?= base_url('pajak'); ?>';
         }else if(choice.isDenied){
             // do nothing
         }
@@ -484,5 +529,21 @@ $(document).off('click', '#delete_file').on('click', '#delete_file', function(){
         }
     })
 });
+
+function rupiah(amount) {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+function date_convert(date){
+    // Split the date string into an array [yyyy, mm, dd]
+    let parts = date.split('-');
+    // Rearrange and join the parts to get the desired format dd-mm-yyyy
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
 </script>
 <?= $this->include('layouts/footer') ?>
