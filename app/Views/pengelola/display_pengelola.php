@@ -15,7 +15,7 @@
                         <th>Handphone</th>
                         <th>No. KTP</th>
                         <th>Cabang Resto</th>
-                        <th>Action</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>

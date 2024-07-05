@@ -76,7 +76,7 @@ $routes->get('bills/get_all', 'Bills::get_bills_list');
 $routes->get('invoice', 'Invoice::invoice_page');
 $routes->post('invoice/get_all', 'Invoice::get_invoice_list');
 $routes->get('invoice/form_invoice', 'Invoice::form_invoice');
-$routes->get('invoice/get_all_resto', 'Invoice::get_all_resto');
+$routes->post('invoice/get_all_resto', 'Invoice::get_all_resto');
 $routes->get('invoice/get_resto_detail', 'Invoice::get_resto_detail');
 $routes->post('invoice/check_fee_header', 'Invoice::check_fee_header');
 $routes->post('invoice/check_invoice_number', 'Invoice::check_invoice_number');
@@ -94,6 +94,7 @@ $routes->post('invoice/update_uploaded_invoice', 'Invoice::update_uploaded_invoi
 $routes->post('invoice/update_selected_outstanding_invoice', 'Invoice::update_selected_outstanding_invoice');
 $routes->post('invoice/get_all_outstanding', 'Invoice::get_all_outstanding');
 $routes->post('invoice/get_data_by_id', 'Invoice::get_data_by_id');
+$routes->post('invoice/get_managerial_area', 'Invoice::get_managerial_area');
 
 // PAJAK
 $routes->get('pajak', 'Pajak::pajak_page');
@@ -114,4 +115,5 @@ $routes->get('file/downloadFile/(:any)/(:any)', 'FileServe::downloadFile/$1/$2')
 // REPORT
 $routes->get('report/receive_fee', 'Report::receive_fee_page');
 $routes->post('report/receive_fee/get_all', 'Report::receive_fee_get_all');
+$routes->post('report/receive_fee/export_to_excel', 'Report::receive_fee_export');
 

@@ -19,16 +19,26 @@ class M_invoice extends Model
         return $result;
     }
 
-    public function get_all_resto($search_term){
+    public function get_all_resto($search_term, $managerial_area_list){
         $where_params = [
             'a.is_active' => '1'
         ];
-        return $this->db->table('tbranch a')
-                        ->select('a.branch_id AS id, a.branch_name AS value')
-                        ->join('tbranch_group b', 'b.branch_group_id = a.branch_group_id', 'left')
-                        ->where($where_params)
-                        ->like('a.branch_name', $search_term, 'both')
-                        ->get()->getResult();
+        if($managerial_area_list != ''){
+            return $this->db->table('tbranch a')
+                            ->select('a.branch_id AS id, a.branch_name AS value')
+                            ->join('tbranch_group b', 'b.branch_group_id = a.branch_group_id', 'left')
+                            ->where($where_params)
+                            ->whereIn('a.branch_id', $managerial_area_list)
+                            ->like('a.branch_name', $search_term, 'both')
+                            ->get()->getResult();
+        }else{
+            return $this->db->table('tbranch a')
+                            ->select('a.branch_id AS id, a.branch_name AS value')
+                            ->join('tbranch_group b', 'b.branch_group_id = a.branch_group_id', 'left')
+                            ->where($where_params)
+                            ->like('a.branch_name', $search_term, 'both')
+                            ->get()->getResult();
+        }
     }
 
     public function get_resto_detail($branch_id){
@@ -423,6 +433,13 @@ class M_invoice extends Model
             $value->inv_date = date('d-m-Y', strtotime($value->inv_date));
         }
         return $result;
+    }
+
+    public function get_managerial_area($managerial_area_list){
+        return $this->db->table('tbranch a')
+                        ->select('a.branch_name')
+                        ->whereIn('a.branch_id', $managerial_area_list)
+                        ->get()->getResult();
     }
 }
 

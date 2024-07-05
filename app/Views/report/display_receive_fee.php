@@ -2,7 +2,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
-            <h4 class="text-center">LAPORAN <i>Receive Fee</i></h4>
+            <h4 class="text-center">Laporan Parkir Harian</h4>
         </div>
         <div class="col-lg-5"></div>
         <div class="col-lg-2 text-center">
@@ -10,7 +10,11 @@
         </div>
         <div class="col-lg-5"></div>
         <div class="col-lg-12">
-            <!-- <a type="button" class="btn btn-sm btn-primary" id="tambah_penagihan" href="<?//= base_url('receive_fee/form_receive_fee'); ?>">+ Tambah data penagihan</a> -->
+            <form action="<?= base_url('report/receive_fee/export_to_excel'); ?>" target="_blank" method="POST">
+                <input type="hidden" name="tgl_receive_export">
+                <button type="submit" class="btn btn-sm btn-success text-center text-white"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to Excel</button>
+            </form>
+            <!-- <a class="btn btn-sm btn-success p-1" target="_blank" href="<?//= base_url('report/receive_fee/export_to_excel'); ?>">EXPORT KE EXCEL</a> -->
             <table id="table_master_receive_fee" class="table table-bordered table-hover">
                 <thead class="bg-primary text-white text-center">
                     <tr>
@@ -41,6 +45,8 @@ $(document).ready(function () {
     });
     load_receive_fee_table();
     $(document).off('change', '#tgl_receive_fee').on('change', '#tgl_receive_fee', function(){
+        $(document).find('[name="tgl_receive_export"]').val($(this).val());
+        // console.log($(document).find('[name="tgl_receive_export"]').val())
         $('#table_master_receive_fee').DataTable().ajax.reload();
     })
 });

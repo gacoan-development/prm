@@ -24,10 +24,11 @@ class Invoice extends BaseController
     }
 
     public function get_all_resto(){
-        if($this->request->getGet('term') != null){
-            $search_term = $this->request->getGet('term');
+        if($this->request->getPost('term') != null){
+            $search_term = $this->request->getPost('term');
+            $managerial_area_list = $this->request->getPost('managerial_area_list');
             $minvoice = new M_invoice();
-            $result = $minvoice->get_all_resto($search_term);
+            $result = $minvoice->get_all_resto($search_term, $managerial_area_list);
             return json_encode($result);
         }else{
             return json_encode('');
@@ -197,6 +198,13 @@ class Invoice extends BaseController
         $inv_id = $this->request->getPost('inv_id');
         $minvoice = new M_invoice();
         $result = $minvoice->get_data_by_id($inv_id);
+        return json_encode($result);
+    }
+
+    public function get_managerial_area(){
+        $managerial_area_list = $this->request->getPost('managerial_area_list');
+        $minvoice = new M_invoice();
+        $result = $minvoice->get_managerial_area($managerial_area_list);
         return json_encode($result);
     }
     

@@ -13,7 +13,7 @@ class M_report extends Model
                     ,`tbl_main`.pay_off_nominal as 'setoran_harian_bill'
                     ,`tbl_main`.selisih as 'selisih'
                     ,SUM(`tbl_terhutang`.billed_nominal - `tbl_terhutang`.pay_off_nominal) as 'jumlah_terhutang'
-                    ,concat(round(( `tbl_main`.pay_off_nominal / `tbl_main`.billed_nominal * 100)), '%') as 'persentase_setoran_harian'
+                    ,concat(IF(round(( `tbl_main`.pay_off_nominal / `tbl_main`.billed_nominal * 100)) IS NOT NULL, round(( `tbl_main`.pay_off_nominal / `tbl_main`.billed_nominal * 100)), 0), '%') as 'persentase_setoran_harian'
                     ,`tbl_main`.inv_note as 'keterangan'
 
                     from

@@ -4,13 +4,17 @@
         <div class="col-lg-12">
             <h4 class="text-center">DATA PENAGIHAN (INVOICE)</h4>
         </div>
-        <div class="col-lg-5"></div>
-        <div class="col-lg-2 text-center">
-            <input type="text" name="tgl_invoice" id="tgl_invoice" class="form-control form-control-sm text-center datepicker" value="<?= date('d-m-Y'); ?>">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4 text-center">
+            <div class="input-group mb-3">
+                <button class="btn btn-sm btn-dark" type="button" id="button_prev_date"><i class="bi bi-caret-left-fill"></i></button>
+                <input type="text" name="tgl_invoice" id="tgl_invoice" class="form-control form-control-sm border-dark text-center datepicker" value="<?= date('d-m-Y'); ?>">
+                <button class="btn btn-sm btn-dark" type="button" id="button_next_date"><i class="bi bi-caret-right-fill"></i></button>
+            </div>
         </div>
-        <div class="col-lg-5"></div>
+        <div class="col-lg-4"></div>
         <div class="col-lg-12">
-            <a type="button" class="btn btn-sm btn-primary" id="tambah_penagihan" href="<?= base_url('invoice/form_invoice'); ?>">+ Tambah data penagihan</a>
+            <a type="button" class="btn btn-sm btn-primary btn_tambah" id="tambah_penagihan" menu-available-for="2 3 4" href="<?= base_url('invoice/form_invoice'); ?>">+ Tambah data penagihan</a>
             <table id="table_master_invoice" class="table table-bordered table-hover">
                 <thead class="bg-primary text-white text-center">
                     <tr>
@@ -46,12 +50,14 @@ $(document).ready(function () {
     load_invoice_table();
     $(document).off('change', '#tgl_invoice').on('change', '#tgl_invoice', function(){
         $('#table_master_invoice').DataTable().ajax.reload();
+        restrict_input();
     })
 });
 
 function load_invoice_table(){
     $('table#table_master_invoice').dataTable({
         ajax: {
+            async: false,
             type: "POST",
             url: "<?= base_url('invoice/get_all'); ?>",
             data: function(d){
@@ -125,10 +131,7 @@ function load_invoice_table(){
                 },
                 render: function(data){
                     var html = '<div class="text-center form-inline">'+
-                                    // '<button type="button" class="btn btn-sm btn-dark px-3 py-1"><i class="bi bi-eye"></i></button>&nbsp;'+
-                                    // '<button type="button" class="btn btn-sm btn-primary px-3 py-1"><i class="bi bi-pencil"></i></button>&nbsp;'+
-                                    '<a type="button" class="btn btn-sm btn-primary px-1 py-0" href="<?= base_url('invoice/form_invoice'); ?>?invoice='+data.inv_id+'"><i class="bi bi-pencil"></i></a>&nbsp;'+
-                                    // '<button type="button" class="btn btn-sm btn-danger px-3 py-1"><i class="bi bi-trash"></i></button>'+
+                                    '<a type="button" class="btn btn-sm btn-primary px-1 py-0 btn_edit" menu-available-for="2 3 4" href="<?= base_url('invoice/form_invoice'); ?>?invoice='+data.inv_id+'"><i class="bi bi-pencil"></i></a>&nbsp;'+
                                 '</div>';
                     return html;
                 }
@@ -164,5 +167,65 @@ function load_invoice_table(){
         ],
     });
 }
+$(document).off('click', '#button_next_date').on('click', '#button_next_date', function(){
+    // Get the current date from the input
+    let currentDate = $('[name="tgl_invoice"]').val();
+        
+    // Check if the input has a value in the expected format 'dd-mm-yyyy'
+    if (currentDate && /^\d{2}-\d{2}-\d{4}$/.test(currentDate)) {
+        // Split the input date to get day, month, and year
+        let parts = currentDate.split('-');
+        let day = parseInt(parts[0], 10);
+        let month = parseInt(parts[1], 10) - 1; // Month is zero-based
+        let year = parseInt(parts[2], 10);
+        
+        // Create a new Date object
+        let date = new Date(year, month, day);
+        
+        // Increment the date by one day
+        date.setDate(date.getDate() + 1);
+        
+        // Format the date back to 'dd-mm-yyyy' format
+        let newDay = ('0' + date.getDate()).slice(-2); // Add leading zero
+        let newMonth = ('0' + (date.getMonth() + 1)).slice(-2); // Add leading zero
+        let newYear = date.getFullYear();
+        let nextDate = `${newDay}-${newMonth}-${newYear}`;
+        
+        // Set the new date back to the input
+        $('[name="tgl_invoice"]').val(nextDate).trigger('change');
+    } else {
+        alert('Please enter a date in the format dd-mm-yyyy.');
+    }
+})
+$(document).off('click', '#button_prev_date').on('click', '#button_prev_date', function(){
+    // Get the current date from the input
+    let currentDate = $('[name="tgl_invoice"]').val();
+        
+    // Check if the input has a value in the expected format 'dd-mm-yyyy'
+    if (currentDate && /^\d{2}-\d{2}-\d{4}$/.test(currentDate)) {
+        // Split the input date to get day, month, and year
+        let parts = currentDate.split('-');
+        let day = parseInt(parts[0], 10);
+        let month = parseInt(parts[1], 10) - 1; // Month is zero-based
+        let year = parseInt(parts[2], 10);
+        
+        // Create a new Date object
+        let date = new Date(year, month, day);
+        
+        // Increment the date by one day
+        date.setDate(date.getDate() - 1);
+        
+        // Format the date back to 'dd-mm-yyyy' format
+        let newDay = ('0' + date.getDate()).slice(-2); // Add leading zero
+        let newMonth = ('0' + (date.getMonth() + 1)).slice(-2); // Add leading zero
+        let newYear = date.getFullYear();
+        let nextDate = `${newDay}-${newMonth}-${newYear}`;
+        
+        // Set the new date back to the input
+        $('[name="tgl_invoice"]').val(nextDate).trigger('change');
+    } else {
+        alert('Please enter a date in the format dd-mm-yyyy.');
+    }
+})
 </script>
 <?= $this->include('layouts/footer') ?>

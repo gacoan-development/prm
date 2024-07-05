@@ -34,7 +34,7 @@
                         <li class="sidebar-list d-none" menu-available-for="1 2 3 4 5"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="dollar-sign"></i><span>Transaksi</span></a>
                             <ul class="sidebar-submenu">
                                 <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('invoice'); ?>">Penagihan</a></li>        
-                                <li class="d-none" menu-available-for="2 3 4"><a href="<?= base_url('invoice/form_invoice'); ?>">Form Penagihan</a></li>
+                                <li class="d-none" menu-available-for="2 3 4 5"><a href="<?= base_url('invoice/form_invoice'); ?>">Form Penagihan</a></li>
                                 <!-- <li><a href="<?//= base_url('invoice/resto_dashboard_invoice'); ?>">Kalender Penagihan Resto (Prototype)</a></li> -->
                                 <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('pajak'); ?>">Monitoring Pembayaran Pajak</a></li>
                             </ul>
@@ -42,7 +42,7 @@
                         <li class="sidebar-list d-none" menu-available-for="1 5"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="file-text"></i><span>Laporan</span></a>
                             <ul class="sidebar-submenu">
                                 <!-- <li><a href="<?//= base_url('invoice'); ?>">Penagihan</a></li> -->
-                                <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('report/receive_fee'); ?>"><i>Receive Fee</i></a></li>
+                                <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('report/receive_fee'); ?>">Laporan Parkir Harian</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -133,6 +133,9 @@
 </div>
 <script>
     $(document).ready(function () {
+        restrict_input();
+    });
+    function restrict_input(){
         var user_group_code = '<?= $session->get('user_group_code'); ?>';
         $(document).find('.sidebar-list').each(function(index, element){
             if( $(element).is('[menu-available-for~="'+user_group_code+'"]') ) {
@@ -144,5 +147,17 @@
                 $(element).removeClass('d-none');
             }
         });
-    });
+        $(document).find('.serialize').each(function(index, element){
+            if( $(element).is('[menu-available-for~="'+user_group_code+'"]') ) {
+                $(element).removeClass('d-none');
+            }
+        })
+        $(document).find('.btn_tambah, .btn_edit').each(function(index, element){
+            if( $(element).is('[menu-available-for~="'+user_group_code+'"]') ) {
+                $(element).removeClass('d-none');
+            }else{
+                $(element).addClass('d-none');
+            }
+        })
+    }
 </script>

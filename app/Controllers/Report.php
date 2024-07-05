@@ -14,5 +14,14 @@ class Report extends BaseController
         $result = $mreport->get_receive_fee_all($date_receive_fee);
         return json_encode($result);
     }
+
+    public function receive_fee_export(){
+        $date_receive_fee = $this->request->getPost('tgl_receive_export');
+        $mreport = new M_report();
+        $result = $mreport->get_receive_fee_all($date_receive_fee);
+        $data['result'] = json_encode($result);
+        $data['date_receive_fee'] = $date_receive_fee;
+        return view('report/excel_receive_fee', $data);
+    }
 }
 ?>

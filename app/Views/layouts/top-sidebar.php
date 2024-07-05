@@ -73,7 +73,7 @@
             <!-- <li><a data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i data-feather="user"></i><span data-bs-toggle="modal" data-bs-target="#changePasswordModal"> Ubah Password </span></a></li> -->
             <!-- <li><a href="email_inbox.html"><i data-feather="mail"></i><span>Inbox</span></a></li> -->
             <!-- <li><a href="kanban.html"><i data-feather="file-text"></i><span>Taskboard</span></a></li> -->
-            <li><a href="<?= base_url('/logout'); ?>"><i data-feather="log-in"> </i><span>Log in</span></a></li>
+            <li><a href="<?= base_url('/logout'); ?>"><i data-feather="log-in"> </i><span>Log Out</span></a></li>
           </ul>
         </li>
       </ul>

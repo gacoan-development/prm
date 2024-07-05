@@ -267,15 +267,19 @@ class M_parkir extends Model
     public function check_fee_active($branch_id){
         $where_params = [
             'a.branch_id' => $branch_id,
-            'd.is_active' => '1'
+            // 'd.is_active' => '1'
         ];
+        // $orWhere_params = [
+        //     'd.is_active' => 'IS NOT NULL'
+        // ];
         return $this->db->table('tbranch a')
                         ->select('a.branch_id, a.branch_code, a.branch_address, b.branch_group_name, c.parkmanagement_name, d.fee_id, d.fee_date_active, d.fee_date_exp')
                         ->select('IF(NOW() BETWEEN d.fee_date_active AND d.fee_date_exp, "active", "expired") AS active_status')
                         ->join('tbranch_group b', 'b.branch_group_id = a.branch_group_id', 'left')
                         ->join('tparkmanagement c', 'c.parkmanagement_id = a.parkmanagement_id', 'left')
-                        ->join('tfee_header d', 'd.branch_id = a.branch_id', 'left')
+                        ->join('tfee_header d', 'd.branch_id = a.branch_id AND d.is_active = 1', 'left')
                         ->where($where_params)
+                        // ->orWhere($orWhere_params)
                         ->orderBy('d.fee_id', 'DESC')
                         ->limit(1)
                         ->get()->getResult();

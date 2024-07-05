@@ -6,11 +6,12 @@
     <div class="row">
         <div class="col-lg-12">
             <h4 class="text-center">BUAT PENAGIHAN (INVOICE)</h4>
+            <button class="btn btn-sm btn-success d-none float-end" id="managerial_area_list" data-toggle="tooltip" data-placement="bottom" data-html="true" title="">Resto yang ditangani</button>
         </div>
         <div class="col-lg-12">
             <div class="card border-dark mt-2">
                 <div class="card-header border-dark bg-primary text-white text-center p-1">
-                    <h6>DATA RESTO</h6>
+                    <h6>RESTO</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -159,69 +160,6 @@
                                 </tbody>
                             </table>
                         </div>
-                        <!-- <div class="col-lg-6">
-                            <table class="table-condensed table-hover" width="80%">
-                                <tbody>
-                                    <tr>
-                                        <td>Tarif Code</td>
-                                        <td>:</td>
-                                        <td><input type="text" name="kode_tarif_parkir" id="" class="form-control form-control-sm serialize required" data-title="Kode Tarif" value="TBA" readOnly></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Nama Tarif</td>
-                                        <td>:</td>
-                                        <td><input type="text" name="nama_tarif_parkir" id="" data-title="Nama Tarif" class="form-control form-control-sm serialize required"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Tipe Komisi</td>
-                                        <td>:</td>
-                                        <td>
-                                            <select class="form-control form-control-sm serialize required" name="tipe_komisi" id="tipe_komisi" data-title="Tipe Komisi">
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Lampiran</td>
-                                        <td>:</td>
-                                        <td><input type="text" name="lampiran_tarif_parkir" id="" class="form-control form-control-sm serialize" data-title="Lampiran Tarif"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-lg-6">
-                            <table class="table-condensed table-hover w-100">
-                                <tbody>
-                                    <tr>
-                                        <td>Tanggal Aktif</td>
-                                        <td>:</td>
-                                        <td><input type="text" name="tanggal_aktif_tarif_parkir" id="" class="form-control form-control-sm datepicker serialize required" data-title="Tanggal Aktif Tarif" value="<?= date('d-m-Y') ?>"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Tanggal Expired</td>
-                                        <td>:</td>
-                                        <td><input type="text" name="tanggal_kadaluwarsa_tarif_parkir" id="" class="form-control form-control-sm datepicker serialize required" data-title="Tanggal Kadaluwarsa Tarif"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Status Keaktifan</td>
-                                        <td>:</td>
-                                        <td>
-                                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                                <input type="radio" class="btn-check serialize" name="keaktifan_tarif_parkir" data-title="Keaktifan Tarif" id="aktif" autocomplete="off" value="1" checked>
-                                                <label class="btn btn-sm btn-outline-success" for="aktif">Aktif</label>
-
-                                                <input type="radio" class="btn-check serialize" name="keaktifan_tarif_parkir" data-title="Keaktifan Tarif" id="nonaktif" autocomplete="off" value="0">
-                                                <label class="btn btn-sm btn-outline-danger" for="nonaktif">Non-aktif</label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Keterangan</td>
-                                        <td>:</td>
-                                        <td><input type="text" name="keterangan_tarif_parkir" id="" class="form-control form-control-sm serialize"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> -->
                     </div>
                     <div class="row d-none" id="div_detail_tarif_flat">
                         <div class="col-lg-12">
@@ -251,10 +189,10 @@
                     </div>
                     <div class="row mt-3">
                         <div class="col-lg-12 text-center" id="action_button_compilation">
-                            <button type="button" class="btn btn-sm py-0 px-3 btn-info" id="cetak_form_invoice" data-toggle="tooltip" data-placement="bottom" title="Cetak Invoice"><i data-feather="printer"></i></button>
-                            <button type="button" class="btn btn-sm py-0 px-3 btn-success" id="simpan_form_invoice" data-toggle="tooltip" data-placement="bottom" title="Simpan"><i data-feather="save"></i></button>
-                            <button type="button" class="btn btn-sm py-0 px-3 btn-primary" id="upload_form_invoice" data-toggle="tooltip" data-placement="bottom" title="Upload Invoice" data-inv_id_upload=""><i data-feather="upload"></i></button>
-                            <button type="button" class="btn btn-sm py-0 px-3 btn-danger batal_form_invoice" data-toggle="tooltip" data-placement="bottom" title="Batal Isi Invoice"><i data-feather="x"></i></button>
+                            <button type="button" class="btn btn-sm py-0 px-3 btn-info" id="cetak_form_invoice" data-toggle="tooltip" data-placement="bottom" title="Cetak Invoice"><i data-feather="printer"></i> Cetak</button>
+                            <button type="button" class="btn btn-sm py-0 px-3 btn-success" id="simpan_form_invoice" data-toggle="tooltip" data-placement="bottom" title="Simpan"><i data-feather="save"></i> Simpan</button>
+                            <button type="button" class="btn btn-sm py-0 px-3 btn-primary" id="upload_form_invoice" data-toggle="tooltip" data-placement="bottom" title="Upload Invoice" data-inv_id_upload=""><i data-feather="upload"></i> Unggah</button>
+                            <button type="button" class="btn btn-sm py-0 px-3 btn-danger batal_form_invoice" data-toggle="tooltip" data-placement="bottom" title="Batal Isi Invoice"><i data-feather="x"></i> Batal</button>
                         </div>
                     </div>
                 </div>
@@ -289,6 +227,10 @@
 $(document).ready(function () {
     var print_type = 0;
     var outstanding_invoice_array;
+    var managerial_area_list = '<?= $session->get('managerial_area'); ?>';
+    if(!!managerial_area_list){
+        managerial_area_list = JSON.parse(managerial_area_list);
+    }
     $(document).find('.datepicker').datepicker({
         dateFormat: 'dd-mm-yy',
         changeMonth: true, 
@@ -302,10 +244,11 @@ $(document).ready(function () {
         ajax: {
             url: '<?= base_url('invoice/get_all_resto'); ?>',
             dataType: "json",
-            type: "GET",
+            type: "POST",
             data: function (params) {
                 var queryParameters = {
-                    term: params.term
+                    term: params.term,
+                    managerial_area_list: managerial_area_list
                 }
                 return queryParameters;
             },
@@ -386,8 +329,6 @@ $(document).ready(function () {
     });
     debtCalc();
 
-    $('[data-toggle="tooltip"]').tooltip();
-
     // autofill data resto
     var inv_id = '<?= $this->data['inv_id']; ?>';
     if(inv_id != ''){ 
@@ -410,41 +351,31 @@ $(document).ready(function () {
             }
         });
     }
-    // autofill data tarif parkir
-    // var fee_id = '<?// = $this->data['fee_id']; ?>';
-    // if(fee_id != ''){ 
-    //     $.ajax({
-    //         async: false,
-    //         type: "POST",
-    //         url: "<?// = base_url('tarif_parkir/get_fee'); ?>",
-    //         data: {
-    //             fee_id: fee_id
-    //         },
-    //         dataType: "JSON",
-    //         success: function (response) {
-    //             // console.log(response);
-    //             if(response.length > 0){
-    //                 $(document).find('[name="kode_tarif_parkir"]').val(response[0].fee_code);
-    //                 $(document).find('[name="nama_tarif_parkir"]').val(response[0].fee_name);
-    //                 $(document).find('[name="tipe_komisi"]').val(response[0].revenue_id).trigger('change');
-    //                 $(document).find('[name="tanggal_aktif_tarif_parkir"]').val(date_convert(response[0].fee_date_active));
-    //                 $(document).find('[name="tanggal_kadaluwarsa_tarif_parkir"]').val(date_convert(response[0].fee_date_exp));
-    //                 $(document).find('[name="keaktifan_tarif_parkir"][value="'+response[0].is_active+'"]').trigger('click');
-    //                 $(document).find('[name="keterangan_tarif_parkir"]').val(response[0].fee_note);
-    //                 if(response[0].detail_status == 'detailed'){
-    //                     for(var keys in response){
-    //                         $('table#tabel_detail_tarif').prev('button.add-dynamic-table').trigger('click');
-    //                         $('table#tabel_detail_tarif tbody tr:last').find('[name="kode_order"]').val(response[keys].order_id).trigger('change');
-    //                         $('table#tabel_detail_tarif tbody tr:last').find('[name="tipe_tarif"]').val(response[keys].order_type_fee).trigger('change');
-    //                         $('table#tabel_detail_tarif tbody tr:last').find('[name="nominal_tarif"]').val(response[keys].fee_nominal);
-    //                     }
-    //                 }else if(response[0].detail_status == 'no_detail'){
-    //                     $(document).find('[name="nominal_flat"]').val(response[0].flat_nbill_nominal);
-    //                 }
-    //             }
-    //         }
-    //     });
-    // }
+    var managerial_area_list = '<?= $session->get('managerial_area'); ?>';
+    if(!!managerial_area_list){
+        managerial_area_list = JSON.parse(managerial_area_list);
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "<?= base_url('invoice/get_managerial_area'); ?>",
+            data: {
+                managerial_area_list: managerial_area_list
+            },
+            dataType: "JSON",
+            success: function (response) {
+                // console.log(response);
+                var html = '<ul>';
+                for(var keys in response){
+                    html += '<li>'+response[keys].branch_name+'</li>';
+                }
+                html += '</ul>';
+                $('button#managerial_area_list').attr('title', html).removeClass('d-none');
+            }
+        });
+    }
+    $('[data-toggle="tooltip"]').tooltip({
+        html: true
+    });
     sync_row_dynamic_table();
 });
 
