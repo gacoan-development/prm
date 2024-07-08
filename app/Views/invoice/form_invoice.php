@@ -227,6 +227,7 @@
 $(document).ready(function () {
     var print_type = 0;
     var outstanding_invoice_array;
+    var user_group_code = '<?= $session->get('user_group_code'); ?>';
     var managerial_area_list = '<?= $session->get('managerial_area'); ?>';
     if(!!managerial_area_list){
         managerial_area_list = JSON.parse(managerial_area_list);
@@ -248,6 +249,7 @@ $(document).ready(function () {
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
+                    user_group_code: user_group_code,
                     managerial_area_list: managerial_area_list
                 }
                 return queryParameters;
@@ -352,6 +354,7 @@ $(document).ready(function () {
         });
     }
     var managerial_area_list = '<?= $session->get('managerial_area'); ?>';
+    var user_group_code = '<?= $session->get('user_group_code'); ?>';
     if(!!managerial_area_list){
         managerial_area_list = JSON.parse(managerial_area_list);
         $.ajax({
@@ -359,6 +362,7 @@ $(document).ready(function () {
             type: "POST",
             url: "<?= base_url('invoice/get_managerial_area'); ?>",
             data: {
+                user_group_code: user_group_code,
                 managerial_area_list: managerial_area_list
             },
             dataType: "JSON",
