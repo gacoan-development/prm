@@ -295,5 +295,17 @@ class M_parkir extends Model
         $affected_rows = $this->db->affectedRows();
         return $affected_rows;
     }
+
+    public function get_all_resto($search_term){
+        $where_params = [
+            'a.is_active' => '1'
+        ];
+        return $this->db->table('tbranch a')
+                            ->select('a.branch_id AS id, a.branch_name AS value')
+                            ->join('tbranch_group b', 'b.branch_group_id = a.branch_group_id', 'left')
+                            ->where($where_params)
+                            ->like('a.branch_name', $search_term, 'both')
+                            ->get()->getResult();
+    }
 }
 ?>

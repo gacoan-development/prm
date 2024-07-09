@@ -46,6 +46,7 @@ $routes->post('tarif_parkir/update_form_tarif_parkir', 'Parkir::update_tarif_par
 $routes->post('tarif_parkir/check_fee_active', 'Parkir::check_fee_active');
 $routes->post('tarif_parkir/upload_tarif', 'Parkir::upload_tarif');
 $routes->post('tarif_parkir/update_uploaded_tarif', 'Parkir::update_uploaded_tarif');
+$routes->post('tarif_parkir/get_all_resto', 'Parkir::get_all_resto');
 
 // TIPE ORDER
 $routes->get('order_type', 'Order::order_type_page');

@@ -11,7 +11,7 @@
         <div class="col-lg-5"></div>
         <div class="col-lg-12">
             <form action="<?= base_url('report/receive_fee/export_to_excel'); ?>" target="_blank" method="POST">
-                <input type="hidden" name="tgl_receive_export">
+                <input type="hidden" name="tgl_receive_export" value="<?= date('d-m-Y'); ?>">
                 <button type="submit" class="btn btn-sm btn-success text-center text-white"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to Excel</button>
             </form>
             <!-- <a class="btn btn-sm btn-success p-1" target="_blank" href="<?//= base_url('report/receive_fee/export_to_excel'); ?>">EXPORT KE EXCEL</a> -->

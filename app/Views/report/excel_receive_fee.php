@@ -72,7 +72,7 @@
                 }else{
                     ?>
                     <tr>
-                        <td colspan="100%" class="text-danger text-center"><b>Tidak ada data.</b></td>
+                        <td colspan="9" class="text-danger text-center"><b>Tidak ada data.</b></td>
                     </tr>
                     <?php
                 }

@@ -282,7 +282,7 @@ $(document).ready(function () {
             },
             dataType: "JSON",
             success: function (response) {
-                console.log(response);
+                // console.log(response);
                 if(response.length > 0){
                     if(response[0].fee_status == 'applied'){
                         $.ajax({
@@ -1108,41 +1108,51 @@ $(document).off('click', '#upload_invoice_action').on('click', '#upload_invoice_
     }
 });
 
-$(document).off('change', '.outstanding_invoice').on('change', '.outstanding_invoice', function(){
-    const isChecked = $(this).is(':checked');
-    if(isChecked){
-        $(this).closest('tr').find('.outstanding_invoice_deposit').attr('disabled', false);
-    }else{
-        $(this).closest('tr').find('.outstanding_invoice_deposit').attr('disabled', true);
-    }
-});
+$(function(){ // harus dijadiin satu supaya function lain bisa baca event yang lain (mboh agak laen versi ini)
+    $(document).off('change', '.outstanding_invoice').on('change', '.outstanding_invoice', function(){
+        const isChecked = $(this).is(':checked');
+        if(isChecked){
+            $(this).closest('tr').find('.outstanding_invoice_deposit').attr('disabled', false);
+        }else{
+            $(this).closest('tr').find('.outstanding_invoice_deposit').attr('disabled', true).val(0).keyup();
+        }
+    });
 
-$(document).off('keyup', '.outstanding_invoice_deposit').on('keyup', '.outstanding_invoice_deposit', function(){         
-    var deposit_value = $(this).val();
-    if (deposit_value === '') {
-        $(this).val('0');
-        deposit_value = 0;
-    }
-    // console.log(outstanding_invoice_array);
-    var index = $(this).closest('tr').index();
+    $(document).off('keyup', '.outstanding_invoice_deposit').on('keyup', '.outstanding_invoice_deposit', function(){         
+        var deposit_value = $(this).val();
+        if (deposit_value === '') {
+            $(this).val('0');
+            deposit_value = 0;
+        }
+        var index = $(this).closest('tr').index();
 
-    var terbayar = (parseInt(deposit_value) + parseInt(outstanding_invoice_array[index].pay_off_nominal));
-    $(this).closest('tr').find('.outstanding_paid_off').html(rupiah(terbayar));
+        var terbayar = (parseInt(deposit_value) + parseInt(outstanding_invoice_array[index].pay_off_nominal));
+        $(this).closest('tr').find('.outstanding_paid_off').html(rupiah(terbayar));
 
-    if(outstanding_invoice_array[index].amount_outstanding != null){
-        var terutang = (parseInt(outstanding_invoice_array[index].amount_outstanding) - parseInt(deposit_value));
-    }else{
-        var terutang = (parseInt(outstanding_invoice_array[index].billed_nominal) - parseInt(deposit_value));
-    }
-    
-    // console.log(outstanding_invoice_array)
-    // console.log(parseInt(outstanding_invoice_array[index].amount_outstanding));
-    $(this).closest('tr').find('.outstanding_remainder').html(rupiah(terutang))
-    // console.log(parseRupiah($(this).closest('tr').find('.outstanding_paid_off').html()));
-    // console.log(parseInt(deposit_value));
-    // var terbayar = (parseInt(deposit_value) + parseRupiah($(this).closest('tr').find('.outstanding_paid_off').html()));
-    // $(this).closest('tr').find('.outstanding_paid_off').html(rupiah(terbayar));
-});
+        if(outstanding_invoice_array[index].amount_outstanding != null){
+            var terutang = (parseInt(outstanding_invoice_array[index].amount_outstanding) - parseInt(deposit_value));
+        }else{
+            var terutang = (parseInt(outstanding_invoice_array[index].billed_nominal) - parseInt(deposit_value));
+        }
+        if(terutang >= 0){
+            $(this).closest('tr').find('.outstanding_remainder').html(rupiah(terutang));
+        }else{
+            Swal.fire({
+                icon: "warning",
+                title: "Perhatian",
+                text: "Jumlah setoran melebihi jumlah terhutang. Mohon input kembali jumlah yang benar.",
+                allowOutsideClick: false
+            })
+            .then((feedback)=>{
+                if(feedback.isConfirmed){
+                    $(this).closest('tr').find('.outstanding_invoice_deposit').val(0).keyup();
+                }
+            })
+        }
+    });
+})
+
+
 
 function date_convert(date){
     // Split the date string into an array [yyyy, mm, dd]

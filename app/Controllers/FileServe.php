@@ -16,6 +16,9 @@ class FileServe extends BaseController
             case "pajak":
                 $folder = 'taxpay_attachments';
             break;
+            case "invoice":
+                $folder = 'inv_attachments';
+            break;
         }
         
         $filePath = WRITEPATH . $folder.'/' . $filename;
@@ -42,6 +45,9 @@ class FileServe extends BaseController
             break;
             case "pajak":
                 $folder = 'taxpay_attachments';
+            break;
+            case "invoice":
+                $folder = 'inv_attachments';
             break;
         }
 

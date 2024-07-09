@@ -102,13 +102,19 @@ function load_invoice_table(){
             },
             {
                 data: {
-                    inv_status: "inv_status"                    
+                    inv_status: "inv_status",
+                    billed_nominal: "billed_nominal",
+                    pay_off_nominal: "pay_off_nominal"             
                 },
                 render: function(data){
-                    if(data.inv_status == '1'){
-                        return 'Complete';
+                    if(data.billed_nominal != 0){
+                        if(data.inv_status == '1'){
+                            return 'Complete';
+                        }else{
+                            return 'Outstanding';
+                        }
                     }else{
-                        return 'Outstanding';
+                        return 'outstanding';
                     }
                 }
             },
@@ -127,10 +133,17 @@ function load_invoice_table(){
             },
             {
                 data: {
-                    'inv_id': 'inv_id'
+                    inv_id: 'inv_id',
+                    inv_attachment: 'inv_attachment'
                 },
                 render: function(data){
+                    if(data.inv_attachment != '' && data.inv_attachment != null){
+                        var view_html = '<button type="button" class="btn btn-sm btn-dark px-1 py-0 attachment" menu-available-for="1 2 3 4 5" data-attachment="'+data.inv_attachment+'"><i class="bi bi-file-earmark-image"></i></button>&nbsp;';
+                    }else{
+                        var view_html = '';
+                    }
                     var html = '<div class="text-center form-inline">'+
+                                    view_html+
                                     '<a type="button" class="btn btn-sm btn-primary px-1 py-0 btn_edit" menu-available-for="2 3 4" href="<?= base_url('invoice/form_invoice'); ?>?invoice='+data.inv_id+'"><i class="bi bi-pencil"></i></a>&nbsp;'+
                                 '</div>';
                     return html;
@@ -166,6 +179,7 @@ function load_invoice_table(){
             { className: 'text-center', targets: [2, 3, 4, 5, 6, 7, 8] },
         ],
     });
+    restrict_input();
 }
 $(document).off('click', '#button_next_date').on('click', '#button_next_date', function(){
     // Get the current date from the input
@@ -226,6 +240,12 @@ $(document).off('click', '#button_prev_date').on('click', '#button_prev_date', f
     } else {
         alert('Please enter a date in the format dd-mm-yyyy.');
     }
+});
+$(document).off('click', '.attachment').on('click', '.attachment', function(){
+    var origin = 'invoice';
+    var attachment = $(this).data('attachment');
+    imageUrl = '<?= base_url('file/viewFile/'); ?>'+origin+'/'+attachment;
+    window.open(imageUrl, '_blank');
 })
 </script>
 <?= $this->include('layouts/footer') ?>

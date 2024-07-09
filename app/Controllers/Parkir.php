@@ -15,6 +15,17 @@ class Parkir extends BaseController
         return json_encode($result);
     }
 
+    public function get_all_resto(){
+        if($this->request->getPost('term') != null){
+            $search_term = $this->request->getPost('term');
+            $mparkir = new M_parkir();
+            $result = $mparkir->get_all_resto($search_term);
+            return json_encode($result);
+        }else{
+            return json_encode('');
+        }
+    }
+
     public function form_parkir(){
         $branch_id = $this->request->getGet('branch');
         $fee_id = $this->request->getGet('fee');

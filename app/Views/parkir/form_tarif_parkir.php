@@ -184,9 +184,9 @@ $(document).ready(function () {
         minimumResultsForSearch: 10,
         width: '100%',
         ajax: {
-            url: '<?= base_url('invoice/get_all_resto'); ?>',
+            url: '<?= base_url('tarif_parkir/get_all_resto'); ?>',
             dataType: "json",
-            type: "GET",
+            type: "POST",
             data: function (params) {
                 var queryParameters = {
                     term: params.term
