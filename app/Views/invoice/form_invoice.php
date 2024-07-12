@@ -793,45 +793,63 @@ $('.batal_form_invoice').click(function(){
 });
 
 $(document).off('click', '#cetak_form_invoice').on('click', '#cetak_form_invoice', function(){
-    update_invoice_header(print_type);
-    var url;
-    var branch_id = $(document).find('[name="nama_resto"]').val();
-    var inv_date = $(document).find('[name="tgl_invoice"]').val();
-    var checked_outstanding_invoice = [];
-    $('.outstanding_invoice:checked').each(function (index, element) {
-        checked_outstanding_invoice.push(this.value);
-    });
-    checked_outstanding_invoice = checked_outstanding_invoice.join(',');
-    switch(print_type){
-        case 1:
-            url = '<?= base_url('invoice/print_flat') ?>';
-        break;
-        case 2:
-            url = '<?= base_url('invoice/print_persen') ?>';
-        break;
-        default:
-        break;
+    var bill_amount_clear = true;
+    if(!$('#div_tabel_detail_persen').hasClass('d-none')){ // berarti dia tampak
+        $(document).find('#tabel_detail_persen').find('.bill_amount').each(function(index, element){
+            var this_value = parseInt($(element).val()) || 0;
+            if(this_value <= 0){
+                bill_amount_clear = false;
+            }
+        });
     }
-    var newWindow = window.open('', 'newWindow', 'height=700,width=900');
-    var form = $('<form>', {
-        action: url,
-        method: 'POST',
-        target: 'newWindow'
-    }).append($('<input>', {
-        type: 'hidden',
-        name: 'branch_id',
-        value: branch_id
-    })).append($('<input>', {
-        type: 'hidden',
-        name: 'inv_date',
-        value: inv_date
-    }))
-    // .append($('<input>', {
-    //     type: 'hidden',
-    //     name: 'checked_outstanding_invoice',
-    //     value: checked_outstanding_invoice
-    // }));
-    form.appendTo('body').submit().remove();
+    if(bill_amount_clear){
+        update_invoice_header(print_type);
+        var url;
+        var branch_id = $(document).find('[name="nama_resto"]').val();
+        var inv_date = $(document).find('[name="tgl_invoice"]').val();
+        var checked_outstanding_invoice = [];
+        $('.outstanding_invoice:checked').each(function (index, element) {
+            checked_outstanding_invoice.push(this.value);
+        });
+        checked_outstanding_invoice = checked_outstanding_invoice.join(',');
+        switch(print_type){
+            case 1:
+                url = '<?= base_url('invoice/print_flat') ?>';
+            break;
+            case 2:
+                url = '<?= base_url('invoice/print_persen') ?>';
+            break;
+            default:
+            break;
+        }
+        var newWindow = window.open('', 'newWindow', 'height=700,width=900');
+        var form = $('<form>', {
+            action: url,
+            method: 'POST',
+            target: 'newWindow'
+        }).append($('<input>', {
+            type: 'hidden',
+            name: 'branch_id',
+            value: branch_id
+        })).append($('<input>', {
+            type: 'hidden',
+            name: 'inv_date',
+            value: inv_date
+        }))
+        // .append($('<input>', {
+        //     type: 'hidden',
+        //     name: 'checked_outstanding_invoice',
+        //     value: checked_outstanding_invoice
+        // }));
+        form.appendTo('body').submit().remove();
+    }else if(!bill_amount_clear){
+        Swal.fire({
+            icon: "warning",
+            title: "Perhatian!",
+            text: "Mohon isi detail bill/nominal detail pendapatan parkir.",
+            allowOutsideClick: false
+        })
+    }
 });
 
 $(document).off('click', '#simpan_form_invoice').on('click', '#simpan_form_invoice', function(){
@@ -1216,7 +1234,7 @@ function load_invoice(branch_id, inv_date){
         },
         dataType: "JSON",
         success: function (response) {
-            // console.log(response)
+            console.log(response)
             var inv_attachment = response[0].inv_attachment;
             $(document).find('#detail_penagihan').removeClass('d-none');
             $(document).find('#div_buat_penagihan').addClass('d-none');
@@ -1243,7 +1261,7 @@ function load_invoice(branch_id, inv_date){
                     branch_id: branch_id
                 },
                 dataType: "JSON",
-                success: function (response) {
+                success: function (response_fee_format) {
                     function rupiah(amount) {
                         return new Intl.NumberFormat('id-ID', {
                             style: 'currency',
@@ -1252,17 +1270,15 @@ function load_invoice(branch_id, inv_date){
                             maximumFractionDigits: 0
                         }).format(amount);
                     }
-                    // console.log(response);
-                    $(document).find('#jenis_tarif').addClass('bg-warning text-white').html(response[0].revenue_sharing_type);
-                    // console.log(response[0].revenue_id)
-                    switch(response[0].revenue_id){
+                    $(document).find('#jenis_tarif').addClass('bg-warning text-white').html(response_fee_format[0].revenue_sharing_type);
+                    switch(response_fee_format[0].revenue_id){
                         case "1":
                         case "2":
                             print_type = 1; // format flat
                             $(document).find('#div_tabel_detail_flat').removeClass('d-none');
                             $(document).find('#div_tabel_detail_persen').addClass('d-none');
-                            $(document).find('#nominal_flat').html(rupiah(response[0].flat_nbill_nominal));
-                            $(document).find('#total_invoice').html(rupiah(response[0].flat_nbill_nominal));
+                            $(document).find('#nominal_flat').html(rupiah(response_fee_format[0].flat_nbill_nominal));
+                            $(document).find('#total_invoice').html(rupiah(response_fee_format[0].flat_nbill_nominal));
                             if(inv_attachment == null || inv_attachment == ''){ // kalo udah ada file upload-an berarti udah ditutup invoice-nya
                                 debtCalc();
                             }
@@ -1274,32 +1290,35 @@ function load_invoice(branch_id, inv_date){
                             $(document).find('#div_tabel_detail_persen').removeClass('d-none');
 
                             var html = '';
-                            for(var keys in response){
-                                if(response[keys].order_type_fee == 'F'){
+                            for(var keys in response_fee_format){
+                                if(response_fee_format[keys].order_type_fee == 'F'){
                                     var order_type_fee = 'FLAT';
-                                    var nominal = rupiah(response[keys].fee_nominal);
+                                    var nominal = rupiah(response_fee_format[keys].fee_nominal);
                                     var prepend = '';
                                     var append = '<span class="input-group-text">Bill</span>';
-                                }else if(response[keys].order_type_fee == 'P'){
+                                }else if(response_fee_format[keys].order_type_fee == 'P'){
                                     var order_type_fee = 'PERCENTAGE';
-                                    var nominal = response[keys].fee_nominal+' %';
+                                    var nominal = response_fee_format[keys].fee_nominal+' %';
                                     var prepend = '<span class="input-group-text">Rp</span>';
                                     var append = '';
                                 }
+                                var order_id = response_fee_format[keys].order_id;
+                                var order_in_response = response.filter(function(value){ return value.order_id});
+                                console.log(order_in_response);
                                 html += '<tr>'+
                                             '<td>'+(parseInt(keys)+1)+'</td>'+
-                                            '<td>'+response[keys].order_code+'</td>'+
-                                            '<td>'+response[keys].order_name+'</td>'+
+                                            '<td>'+response_fee_format[keys].order_code+'</td>'+
+                                            '<td>'+response_fee_format[keys].order_name+'</td>'+
                                             '<td class="text-center">'+order_type_fee+'</td>'+
-                                            '<td class="text-center fee_nominal" data-nominal="'+response[keys].fee_nominal+'">'+nominal+'</td>'+
+                                            '<td class="text-center fee_nominal" data-nominal="'+response_fee_format[keys].fee_nominal+'">'+nominal+'</td>'+
                                             '<td>'+
                                                 '<div class="input-group">'+
                                                     prepend+
-                                                    '<input type="text" class="form-control form-control-sm text-center bill_amount" data-calculation-type="'+response[keys].order_type_fee+'">'+
+                                                    '<input type="text" class="form-control form-control-sm text-center number bill_amount" data-calculation-type="'+response_fee_format[keys].order_type_fee+'">'+
                                                     append+
                                                 '</div>'+
                                             '</td>'+
-                                            '<td><input class="form-control form-control-sm text-center total_per_order" data-order-id="'+response[keys].order_id+'" data-fee-id="'+response[keys].fee_id+'" readOnly value="0"></td>'+
+                                            '<td><input class="form-control form-control-sm text-center total_per_order" data-order-id="'+response_fee_format[keys].order_id+'" data-fee-id="'+response_fee_format[keys].fee_id+'" readOnly value="0"></td>'+
                                         '</tr>';
                             }
                             $(document).find('table#tabel_detail_persen tbody').empty().append(html);

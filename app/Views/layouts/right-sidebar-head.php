@@ -45,6 +45,12 @@
                                 <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('report/receive_fee'); ?>">Laporan Parkir Harian</a></li>
                             </ul>
                         </li>
+                        <li class="sidebar-list d-none" menu-available-for="5"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="users"></i><span>Manajemen Pengguna</span></a>
+                            <ul class="sidebar-submenu">
+                                <!-- <li><a href="<?//= base_url('invoice'); ?>">Penagihan</a></li> -->
+                                <li class="d-none" menu-available-for="5"><a href="<?= base_url('users'); ?>">Daftar Pengguna</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 <!-- <li class="sidebar-main-title">

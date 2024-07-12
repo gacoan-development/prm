@@ -415,7 +415,7 @@ $(document).off('click', 'button.add-dynamic-table').on('click', 'button.add-dyn
                                 '</td>'+
                                 '<td>'+
                                     '<div class="input-group">'+
-                                        '<span class="input-group-text rupiah_marker d-none">Rp.</span>'+
+                                        '<span class="input-group-text rupiah_marker">Rp.</span>'+
                                         '<input class="form-control form-control-sm text-center" name="nominal_tarif">'+
                                         '<span class="input-group-text percent_marker d-none">%</span>'+
                                     '</div>'+
@@ -508,21 +508,23 @@ $('button#simpan_form_tarif_parkir').off('click').on('click', function(){
         var data = $('.serialize').filter(function(index, element) {
                         return $(element).val() != '';
                     }).serializeArray();
-        if($('#tabel_detail_tarif').find('input, select').length > 0){ // kalau ada detailnya baru di push, kalo ndak ada ya ngapain wkwk
-            var detail_tarif_parkir_compilation = [];
-            var detail_tarif =  $('#tabel_detail_tarif').find('tbody tr').each(function(index, element){
-                                    var detail_tarif_parkir_row = {};
-                                    $(element).find('input, select').each(function(index2, element2){
-                                        var element2name = $(element2).attr('name');
-                                        var element2value = $(element2).val();
-                                        detail_tarif_parkir_row[element2name] = element2value;
-                                    })
-                                    detail_tarif_parkir_compilation.push(detail_tarif_parkir_row);
-                                });
-            data.push({
-                name: "detail_tarif_parkir",
-                value: detail_tarif_parkir_compilation
-            })
+        if(!$('#div_detail_tarif_dinamis').hasClass('d-none')){ // kalau tabel tarif-nya keliatan
+            if($('#tabel_detail_tarif').find('input, select').length > 0){ // kalau ada detailnya baru di push, kalo ndak ada ya ngapain wkwk
+                var detail_tarif_parkir_compilation = [];
+                var detail_tarif =  $('#tabel_detail_tarif').find('tbody tr').each(function(index, element){
+                                        var detail_tarif_parkir_row = {};
+                                        $(element).find('input, select').each(function(index2, element2){
+                                            var element2name = $(element2).attr('name');
+                                            var element2value = $(element2).val();
+                                            detail_tarif_parkir_row[element2name] = element2value;
+                                        })
+                                        detail_tarif_parkir_compilation.push(detail_tarif_parkir_row);
+                                    });
+                data.push({
+                    name: "detail_tarif_parkir",
+                    value: detail_tarif_parkir_compilation
+                })
+            }
         }
         // console.log(data);
         if(fee_code == 'TBA'){ // insert

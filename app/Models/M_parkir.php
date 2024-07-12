@@ -239,7 +239,14 @@ class M_parkir extends Model
                     ->update($update_data);
         $affected_header = $this->db->affectedRows();
         if(is_array($detail_tarif_parkir)){ // jika detail headernya udah ketangkep dan emang ada detail headernya
-            if(intval($affected_header) > 0){ // jika headernya udah berhasil ke-insert
+            if(intval($affected_header) > 0){ // jika headernya udah berhasil ke-update
+                // harus manualin update flat_nbill_amount
+                $update_flat_nbill = [
+                    'flat_nbill_nominal' => 0
+                ];
+                $this->db->table('tfee_header')
+                            ->where('fee_id', $fee_id)
+                            ->update($update_flat_nbill);
                 $this->db->table('tfee_detail')
                             ->where('fee_id', $fee_id)
                             ->delete();
@@ -260,6 +267,9 @@ class M_parkir extends Model
             $affected_detail = $this->db->affectedRows();
             return $affected_detail;
         }else{
+            $this->db->table('tfee_detail')
+                            ->where('fee_id', $fee_id)
+                            ->delete();
             return $affected_header;
         }
     }

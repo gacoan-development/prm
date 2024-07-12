@@ -118,3 +118,8 @@ $routes->get('report/receive_fee', 'Report::receive_fee_page');
 $routes->post('report/receive_fee/get_all', 'Report::receive_fee_get_all');
 $routes->post('report/receive_fee/export_to_excel', 'Report::receive_fee_export');
 
+// USERS
+$routes->get('users', 'User::users_page');
+$routes->get('users/get_all', 'User::get_all');
+$routes->get('users/form_users', 'User::form_users');
+$routes->post('users/get_master_group_users', 'User::get_master_group_users');
