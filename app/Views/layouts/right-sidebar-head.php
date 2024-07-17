@@ -31,10 +31,10 @@
                                 <li class="d-none" menu-available-for="5"><a href="<?= base_url('order_type'); ?>">Tipe Order</a></li>
                             </ul>
                         </li>
-                        <li class="sidebar-list d-none" menu-available-for="1 2 3 4 5"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="dollar-sign"></i><span>Transaksi</span></a>
+                        <li class="sidebar-list d-none" menu-available-for="1 2 3 4 5 6"><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="dollar-sign"></i><span>Transaksi</span></a>
                             <ul class="sidebar-submenu">
                                 <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('invoice'); ?>">Penagihan</a></li>        
-                                <li class="d-none" menu-available-for="2 3 4 5"><a href="<?= base_url('invoice/form_invoice'); ?>">Form Penagihan</a></li>
+                                <li class="d-none" menu-available-for="2 3 4 5 6"><a href="<?= base_url('invoice/form_invoice'); ?>">Form Penagihan</a></li>
                                 <!-- <li><a href="<?//= base_url('invoice/resto_dashboard_invoice'); ?>">Kalender Penagihan Resto (Prototype)</a></li> -->
                                 <li class="d-none" menu-available-for="1 5"><a href="<?= base_url('pajak'); ?>">Monitoring Pembayaran Pajak</a></li>
                             </ul>

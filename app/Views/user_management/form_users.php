@@ -74,7 +74,7 @@
                                             <input type="file" class="form-control" name="pengelola_attachment" data-title="Lampiran Pengelola Parkir" id="">
                                         </td>
                                     </tr> -->
-                                    <tr>
+                                    <!-- <tr>
                                         <td>Group Pengguna</td>
                                         <td>:</td>
                                         <td>
@@ -82,69 +82,84 @@
 
                                             </select>
                                         </td>
-                                    </tr>
+                                    </tr> -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="row d-none" id="div_region_managed">
-                        <div class="col-lg-12">
-                            <button type="button" class="btn btn-sm btn-primary mt-2 add-dynamic-table">+ Resto yang dikelola</button>
-                            <table class="table table-condensed table-bordered table-hover dynamic-table text-center m-2" id="tabel_resto_yang_dikelola">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Branch Code</th>
-                                        <th>Branch Name</th>
-                                        <th>Branch Address</th>
-                                        <th>Branch Group</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="row d-none" id="div_area_managed">
-                        <div class="col-lg-12">
-                            <button type="button" class="btn btn-sm btn-primary mt-2 add-dynamic-table">+ Resto yang dikelola</button>
-                            <table class="table table-condensed table-bordered table-hover dynamic-table text-center m-2" id="tabel_resto_yang_dikelola">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Branch Code</th>
-                                        <th>Branch Name</th>
-                                        <th>Branch Address</th>
-                                        <th>Branch Group</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="row d-none" id="div_branch_managed">
-                        <div class="col-lg-12">
-                            <button type="button" class="btn btn-sm btn-primary mt-2 add-dynamic-table">+ Resto yang dikelola</button>
-                            <table class="table table-condensed table-bordered table-hover dynamic-table text-center m-2" id="tabel_resto_yang_dikelola">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Branch Code</th>
-                                        <th>Branch Name</th>
-                                        <th>Branch Address</th>
-                                        <th>Branch Group</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
                     <div class="row">
+                        <div class="col-lg-6">
+                            <table class="table-condensed table-hover" width="80%">
+                                <tr>
+                                    <td>Grup Pengguna</td>
+                                    <td>:</td>
+                                    <td>
+                                        <select name="group_pengguna" id="" data-title="Grup Pengguna" class="form-control form-control-sm serialize required">
+
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="extra_row d-none" id="region_managed">
+                                    <td>Wilayah</td>
+                                    <td>:</td>
+                                    <td>
+                                        <select name="wilayah_pengguna" id="" data-title="Wilayah Pengguna" class="form-control form-control-sm serialize required">
+
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="extra_row d-none" id="branch_managed">
+                                    <td>Nama Resto</td>
+                                    <td>:</td>
+                                    <td>
+                                        <select name="cabang_pengguna" id="" data-title="Cabang Pengguna" class="form-control form-control-sm selectpicker serialize required">
+
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row extra_row d-none" id="div_area_managed">
+                        <div class="col-lg-12">
+                            <button type="button" class="btn btn-sm btn-primary mt-2 add-dynamic-table">+ Resto yang dikelola</button>
+                            <table class="table table-condensed table-bordered table-hover dynamic-table text-center m-2" id="tabel_resto_yang_dikelola">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Branch Code</th>
+                                        <th>Branch Name</th>
+                                        <th>Branch Address</th>
+                                        <th>Branch Group</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row extra_row d-none" id="div_branch_managed">
+                        <div class="col-lg-12">
+                            <!-- <button type="button" class="btn btn-sm btn-primary mt-2 add-dynamic-table">+ Resto yang dikelola</button>
+                            <table class="table table-condensed table-bordered table-hover dynamic-table text-center m-2" id="tabel_resto_yang_dikelola">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Branch Code</th>
+                                        <th>Branch Name</th>
+                                        <th>Branch Address</th>
+                                        <th>Branch Group</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table> -->
+                        </div>
+                    </div>
+                    <div class="row d-none" id="action_button_div">
                         <div class="col-lg-12 text-center">
-                            <button type="button" class="btn btn-sm btn-success" id="simpan_form_pengelola">SIMPAN</button>
-                            <button type="button" class="btn btn-sm btn-danger" id="batal_form_pengelola">BATAL</button>
+                            <button type="button" class="btn btn-sm btn-success" id="simpan_form_pengguna">SIMPAN</button>
+                            <button type="button" class="btn btn-sm btn-danger" id="batal_form_pengguna">BATAL</button>
                         </div>
                     </div>
                 </div>
@@ -155,57 +170,109 @@
 <script>
 $(document).ready(function () {
     load_master_group_users();
-    $(document).off('change', 'select[name="nama_resto"]').on('change', 'select[name="nama_resto"]', function(){
-        var selected_value = $(this).find('option:selected').val();
-        var branch_code = branch_address = branch_group = '';
-
-        $.ajax({
-            async: false,
-            type: "GET",
-            url: "<?= base_url('pengelola/get_resto_not_managed_detail') ?>",
-            data: {
-                branch_id: selected_value
-            },
-            dataType: "JSON",
-            success: function (response) {
-                // console.log(response);
-                branch_code = response[0].branch_code;
-                $(this).closest('tr').find('[name="kode_resto"]').val(branch_code);
-                branch_address = response[0].branch_address;
-                branch_group = response[0].branch_group_name;
-            }
-        });
-        var this_index = $(this).closest('tr').index();
-        var same_branch_code = false;
-        $(this).closest('tbody').find('tr').each(function(index, element){
-            if(index != this_index){
-                if($(element).find('[name="kode_resto"]').val() == branch_code){
-                    same_branch_code = true;
-                }
-            }
-        })
-        if(same_branch_code){
-            Swal.fire({
-                icon: "warning",
-                title: "Perhatian",
-                text: "Ada kode resto yang sama. Mohon dicek kembali.",
-                allowOutsideClick: false,
-                showConfirmButton: true
-            })
-            .then((feedback)=>{
-                if(feedback.isConfirmed){
-                    $(this).val(null).trigger('change');
-                    $(this).closest('tr').find('[name="kode_resto"]').val(null);
-                    $(this).closest('tr').find('div.alamat_resto').html('');
-                    $(this).closest('tr').find('div.group_resto').html('');
-                }
-            })
-        }else{
-            $(this).closest('tr').find('[name="kode_resto"]').val(branch_code);
-            $(this).closest('tr').find('div.alamat_resto').html(branch_address);
-            $(this).closest('tr').find('div.group_resto').html(branch_group);
+    $(document).off('change', 'select[name="group_pengguna"]').on('change', 'select[name="group_pengguna"]', function () {
+        var this_position = $(this).find('option:selected').data('text'); 
+        switch(this_position){
+            case "Regional Manager":
+                $('.extra_row').addClass('d-none');
+                $('#region_managed').removeClass('d-none');
+                load_master_wilayah();
+            break;
+            case "Area Manager":
+                $('.extra_row').addClass('d-none');
+                $('#div_area_managed').removeClass('d-none');
+            break;
+            case "Store Manager":
+            case "PIC Resto":
+                $('.extra_row').addClass('d-none');
+                $('#branch_managed').removeClass('d-none');
+                $(document).find('[name="cabang_pengguna"]').select2({
+                    tokenSeparators: [',', ' '],
+                    minimumInputLength: 1,
+                    minimumResultsForSearch: 10,
+                    width: '100%',
+                    ajax: {
+                        url: '<?= base_url('users/get_all_resto'); ?>',
+                        dataType: "json",
+                        type: "GET",
+                        data: function (params) {
+                            var queryParameters = {
+                                term: params.term
+                            }
+                            return queryParameters;
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: $.map(data, function (item) {
+                                    return {
+                                        text: item.value,
+                                        id: item.id
+                                    }
+                                })
+                            };
+                        },
+                        cache: true
+                    },
+                    placeholder: 'Masukkan nama resto'
+                });
+            break;
+            default:
+                $('.extra_row').addClass('d-none');
+            break;
         }
+        $(document).find('#action_button_div').removeClass('d-none');
     });
+    // $(document).off('change', 'select[name="nama_resto"]').on('change', 'select[name="nama_resto"]', function(){
+    //     var selected_value = $(this).find('option:selected').val();
+    //     var branch_code = branch_address = branch_group = '';
+
+    //     $.ajax({
+    //         async: false,
+    //         type: "GET",
+    //         url: "<?//= base_url('pengelola/get_resto_not_managed_detail') ?>",
+    //         data: {
+    //             branch_id: selected_value
+    //         },
+    //         dataType: "JSON",
+    //         success: function (response) {
+    //             // console.log(response);
+    //             branch_code = response[0].branch_code;
+    //             $(this).closest('tr').find('[name="kode_resto"]').val(branch_code);
+    //             branch_address = response[0].branch_address;
+    //             branch_group = response[0].branch_group_name;
+    //         }
+    //     });
+    //     var this_index = $(this).closest('tr').index();
+    //     var same_branch_code = false;
+    //     $(this).closest('tbody').find('tr').each(function(index, element){
+    //         if(index != this_index){
+    //             if($(element).find('[name="kode_resto"]').val() == branch_code){
+    //                 same_branch_code = true;
+    //             }
+    //         }
+    //     })
+    //     if(same_branch_code){
+    //         Swal.fire({
+    //             icon: "warning",
+    //             title: "Perhatian",
+    //             text: "Ada kode resto yang sama. Mohon dicek kembali.",
+    //             allowOutsideClick: false,
+    //             showConfirmButton: true
+    //         })
+    //         .then((feedback)=>{
+    //             if(feedback.isConfirmed){
+    //                 $(this).val(null).trigger('change');
+    //                 $(this).closest('tr').find('[name="kode_resto"]').val(null);
+    //                 $(this).closest('tr').find('div.alamat_resto').html('');
+    //                 $(this).closest('tr').find('div.group_resto').html('');
+    //             }
+    //         })
+    //     }else{
+    //         $(this).closest('tr').find('[name="kode_resto"]').val(branch_code);
+    //         $(this).closest('tr').find('div.alamat_resto').html(branch_address);
+    //         $(this).closest('tr').find('div.group_resto').html(branch_group);
+    //     }
+    // });
     // autofill
     var user_id = '<?= $this->data['user_id']; ?>';
     if(user_id != ''){ 
@@ -334,7 +401,7 @@ $(document).off('click', '.sub-dynamic-table').on('click', '.sub-dynamic-table',
     $(this).closest('tr').remove();
     sync_row_dynamic_table(table_target_id);
 });
-$('button#simpan_form_pengelola').off('click').on('click', function(){
+$('button#simpan_form_pengguna').off('click').on('click', function(){
     var passed = true;
     var not_passed_comp = [];
     $('.required').each(function(index, element){
@@ -491,7 +558,7 @@ function upload_pengelola_attachment(user_id){
         }
     });
 }
-$('#batal_form_pengelola').click(function(){
+$('#batal_form_pengguna').click(function(){
     Swal.fire({
         icon: "question",
         title: "Yakin?",
@@ -563,9 +630,30 @@ function load_master_group_users(){
             if(response.length > 0){
                 var options = '<option value="null" disabled selected>-- PILIH GRUP PENGGUNA --</option>';
                 for(var keys in response){
-                    options += '<option value="'+response[keys].group_user_id+'">'+response[keys].group_name+'</option>';
+                    options += '<option value="'+response[keys].group_user_id+'" data-text="'+response[keys].group_name+'">'+response[keys].group_name+'</option>';
                 }
                 group_user_element.html(options);
+            }
+        }
+    });
+}
+
+function load_master_wilayah(){
+    var wilayah_element = $('select[name="wilayah_pengguna"]');
+    $.ajax({
+        async: false,
+        type: "POST",
+        url: '<?= base_url('users/get_master_wilayah_users'); ?>',
+        // data: "data",
+        dataType: "JSON",
+        success: function (response) {
+            // console.log(response);
+            if(response.length > 0){
+                var options = '<option value="null" disabled selected>-- PILIH WILAYAH --</option>';
+                for(var keys in response){
+                    options += '<option value="'+response[keys].branch_group_id+'" data-text="'+response[keys].branch_group_name+'">'+response[keys].branch_group_name+'</option>';
+                }
+                wilayah_element.html(options);
             }
         }
     });

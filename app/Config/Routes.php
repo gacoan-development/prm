@@ -122,4 +122,6 @@ $routes->post('report/receive_fee/export_to_excel', 'Report::receive_fee_export'
 $routes->get('users', 'User::users_page');
 $routes->get('users/get_all', 'User::get_all');
 $routes->get('users/form_users', 'User::form_users');
+$routes->get('users/get_all_resto', 'User::get_all_resto');
 $routes->post('users/get_master_group_users', 'User::get_master_group_users');
+$routes->post('users/get_master_wilayah_users', 'User::get_master_wilayah_users');

@@ -20,51 +20,50 @@ class M_user extends Model
                         ->get()->getRowArray();
     }
 
+    public function get_all_resto($search_term){
+        $where_params = [
+            'a.is_active' => '1'
+        ];
+        return $this->db->table('tbranch a')
+                        ->select('a.branch_id AS id, a.branch_name AS value')
+                        ->join('tbranch_group b', 'b.branch_group_id = a.branch_group_id', 'left')
+                        ->where($where_params)
+                        ->like('a.branch_name', $search_term, 'both')
+                        ->get()->getResult();
+    }
+
     public function get_all(){
         $query = "SELECT
                     *
-                    FROM 
-                    (-- REGIONAL MANAGER
-                    SELECT
-                    a.user_id, a.user_name, a.user_nik, b.group_name, GROUP_CONCAT(DISTINCT d.branch_group_name) AS region_managed, GROUP_CONCAT(e.branch_name SEPARATOR ' -- ') AS branch_managed, a.is_active
-                    FROM miegacoa_prm.tusers a
-                    LEFT JOIN miegacoa_prm.tgroup_users b ON b.group_user_id = a.group_id
-                    LEFT JOIN miegacoa_prm.tmanagerial_area c ON c.user_id = a.user_id
-                    LEFT JOIN miegacoa_prm.tbranch_group d ON d.branch_group_id = c.branch
-                    LEFT JOIN miegacoa_prm.tbranch e ON e.branch_group_id = d.branch_group_id
-                    WHERE b.group_name = 'Regional Manager'
-                    GROUP BY a.user_id
-                    UNION 
-                    -- AREA MANAGER
-                    SELECT
-                    a.user_id, a.user_name, a.user_nik, b.group_name, GROUP_CONCAT(DISTINCT d.branch_group_name) AS region_managed, GROUP_CONCAT(e.branch_name SEPARATOR ' -- ') AS branch_managed, a.is_active
-                    FROM miegacoa_prm.tusers a
-                    LEFT JOIN miegacoa_prm.tgroup_users b ON b.group_user_id = a.group_id
-                    LEFT JOIN miegacoa_prm.tmanagerial_area c ON c.user_id = a.user_id
-                    LEFT JOIN miegacoa_prm.tbranch e ON e.branch_id = c.branch
-                    LEFT JOIN miegacoa_prm.tbranch_group d ON d.branch_group_id = e.branch_group_id
-                    WHERE b.group_name = 'Area Manager'
-                    GROUP BY a.user_id
-                    UNION 
-                    -- STORE MANAGER
-                    SELECT
-                    a.user_id, a.user_name, a.user_nik, b.group_name, GROUP_CONCAT(DISTINCT d.branch_group_name) AS region_managed, GROUP_CONCAT(e.branch_name SEPARATOR ' -- ') AS branch_managed, a.is_active
-                    FROM miegacoa_prm.tusers a
-                    LEFT JOIN miegacoa_prm.tgroup_users b ON b.group_user_id = a.group_id
-                    LEFT JOIN miegacoa_prm.tmanagerial_area c ON c.user_id = a.user_id
-                    LEFT JOIN miegacoa_prm.tbranch e ON e.branch_id = c.branch
-                    LEFT JOIN miegacoa_prm.tbranch_group d ON d.branch_group_id = e.branch_group_id
-                    WHERE b.group_name = 'Store Manager'
-                    GROUP BY a.user_id
-                    UNION
-                    -- OTHERS
-                    SELECT
-                    a.user_id, a.user_name, a.user_nik, b.group_name, '-' AS region_managed, '-' AS branch_managed, a.is_active
-                    FROM miegacoa_prm.tusers a
-                    LEFT JOIN miegacoa_prm.tgroup_users b ON b.group_user_id = a.group_id
-                    WHERE b.group_name NOT IN('Regional Manager', 'Area Manager', 'Store Manager')
-                    GROUP BY a.user_id) all_data
-                    ORDER BY all_data.user_id ASC 
+                    FROM	
+                        (SELECT
+                        a.user_id, a.user_name, a.user_nik, b.group_name, a.is_active,
+                        GROUP_CONCAT(DISTINCT c.branch_group_name SEPARATOR ', ') AS wilayah, GROUP_CONCAT(d.branch_name SEPARATOR ' -- ') AS cabang
+                        FROM miegacoa_prm.tusers a
+                        LEFT JOIN miegacoa_prm.tgroup_users b ON b.group_user_id = a.group_id
+                        LEFT JOIN miegacoa_prm.tbranch_group c ON c.branch_group_id = a.branch_reference_id
+                        LEFT JOIN miegacoa_prm.tbranch d ON d.branch_group_id = c.branch_group_id
+                        WHERE b.group_name = 'Regional Manager'
+                        GROUP BY a.user_id
+                        UNION
+                        SELECT
+                        a.user_id, a.user_name, a.user_nik, b.group_name, a.is_active,
+                        GROUP_CONCAT(DISTINCT c.branch_group_name SEPARATOR ', ') AS wilayah, GROUP_CONCAT(d.branch_name SEPARATOR ' -- ') AS cabang
+                        FROM miegacoa_prm.tusers a
+                        LEFT JOIN miegacoa_prm.tgroup_users b ON b.group_user_id = a.group_id
+                        LEFT JOIN miegacoa_prm.tbranch d ON d.branch_id = a.branch_reference_id
+                        LEFT JOIN miegacoa_prm.tbranch_group c ON c.branch_group_id = d.branch_group_id
+                        WHERE b.group_name = 'Store Manager'
+                        GROUP BY a.user_id
+                        UNION 
+                        SELECT
+                        a.user_id, a.user_name, a.user_nik, b.group_name, a.is_active,
+                        '-' AS wilayah, '-' AS cabang
+                        FROM miegacoa_prm.tusers a
+                        LEFT JOIN miegacoa_prm.tgroup_users b ON b.group_user_id = a.group_id
+                        WHERE b.group_name NOT IN('Regional Manager', 'Area Manager', 'Store Manager')
+                        GROUP BY a.user_id) compiled_table
+                    ORDER BY compiled_table.user_id ASC 
                     ";
         return $this->db->query($query)
                         ->getResult();
@@ -76,6 +75,15 @@ class M_user extends Model
         );
         return $this->db->table('tgroup_users a')
                         ->where($where_params)
+                        ->get()->getResult();
+    }
+
+    public function get_master_wilayah_users(){
+        // $where_params = array(
+        //     'a.is_active' => '1'
+        // );
+        return $this->db->table('tbranch_group a')
+                        // ->where($where_params)
                         ->get()->getResult();
     }
 }

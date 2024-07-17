@@ -22,9 +22,26 @@ class User extends BaseController
         return view('user_management/form_users', $data);
     }
 
+    public function get_all_resto(){
+        if($this->request->getGet('term') != null){
+            $search_term = $this->request->getGet('term');
+            $muser = new M_user();
+            $result = $muser->get_all_resto($search_term);
+            return json_encode($result);
+        }else{
+            return json_encode('');
+        }
+    }
+
     public function get_master_group_users(){
         $muser = new M_user();
         $result = $muser->get_master_group_users();
+        return json_encode($result);
+    }
+
+    public function get_master_wilayah_users(){
+        $muser = new M_user();
+        $result = $muser->get_master_wilayah_users();
         return json_encode($result);
     }
 

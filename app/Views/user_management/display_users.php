@@ -14,13 +14,13 @@
                         <th>Nama Pengguna</th>
                         <th>Grup Pengguna</th>
                         <th>Wilayah</th>
-                        <th>Area Manajerial <span class="text-danger"><sup>*</sup></span></th>
+                        <th>Area Manajerial</th>
                         <th>Keaktifan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-
+                    
                 </tbody>
             </table>
         </div>
@@ -60,10 +60,10 @@
                     data: "group_name"
                 },
                 {
-                    data: "region_managed"
+                    data: "wilayah"
                 },
                 {
-                    data: "branch_managed"
+                    data: "cabang"
                 },
                 {
                     data: {
